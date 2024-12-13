@@ -1,0 +1,41 @@
+[ ] teacher login
+	[ ] field validation
+	[ ] use oauth for google integration
+	[ ] authentication (tokens in cookies)	
+[ ] admin
+	[ ] teacher and pending teacher tables with ability to approve a pending teacher
+	[ ] click on a a teacher to see their students
+	[ ] send email to tacher upon approval
+[ ] teacher signup 
+	[ ] field validation
+	[ ] send email to admin for approval
+[ ] teacher dashboard
+	[ ] table with students and their details with button for student page
+	[ ] add/delete a student
+	[ ] remind teacher to send email with available times
+[ ] student page
+	[ ] scheduled emails
+	[ ] schedule/cancel email or send now with attachments
+	[ ] choose available time slots
+	[ ] schedule follow up reminder
+	[ ] send email with link to available times
+	[ ] use google meet api to schedule meetings and send mail to both sides
+[ ] database
+	[ ] pending teacher
+		- name
+		- phone
+		- email
+		- address
+	[ ] teacher
+		- personal information
+		- array of students (reference to students)
+	[ ] student
+		- personal info
+		- date
+		- notes
+		- scheduled emails
+	[ ] email
+		- sender
+		- recipient
+		- body
+		- attachments
