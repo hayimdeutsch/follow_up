@@ -29,7 +29,11 @@ export const newUserApplicationTemplate = (user) => {
       <li><strong>Email:</strong> ${user.gmail}</li>
       <li><strong>Phone:</strong> ${user.phone}</li>
     </ul>
-    <p>Please review the application and take the necessary actions.</p>
+<p>Please review the application and take the necessary actions.</p>
+    <form action="http://localhost:3000/admin/users/${user.email}/approve" method="post">
+      <button type="submit">Click here to approve the user</button>
+    </form>
     <p>Thank you.</p>
   `;
+  // Need to add the actual link to the admin dashboard
 };

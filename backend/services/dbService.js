@@ -2,6 +2,7 @@ import Teacher from "../models/Teacher.js";
 import Question from "../models/Question.js";
 import Template from "../models/Template.js";
 import CustomError from "../utils/CustomError.js";
+import Student from "../models/Student.js";
 
 const createUser = async (firstName, lastName, gmail, phone) => {
   const newUser = new Teacher({ firstName, lastName, email: gmail, phone });
@@ -41,7 +42,17 @@ const createApprovedUser = async (firstName, lastName, gmail, phone) => {
   }
 };
 
+const saveUser = async (user) => {
+  try {
+    await user.save();
+    return user;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
 const approveUser = async (gmail) => {
+  console.log(gmail);
   try {
     const user = await Teacher.findOneAndUpdate(
       { email: gmail },
@@ -63,16 +74,19 @@ const isUserApproved = async (gmail) => {
 };
 
 const getTeacherByGmail = async (gmail) => {
-  return await getTeacherByField("gmail", gmail);
+  try {
+    const teacher = await Teacher.findOne({ email: gmail });
+    console.log("teacher", teacher);
+    return teacher;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
 };
 
 const getTeacherByGoogleId = async (googleId) => {
-  return await getTeacherByField("googleId", googleId);
-};
-
-const getTeacherByField = async (field, value) => {
   try {
-    const teacher = await Teacher.findOne({ field: value });
+    const teacher = await Teacher.findOne({ googleId: googleId });
+    console.log("teacher", teacher);
     return teacher;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
@@ -89,15 +103,15 @@ const getAllTeachers = async () => {
 };
 
 const createTemplate = async (title, description, questions) => {
-  const templateQuestions = [];
-  questions.forEach((question) => {
-    const currentQuestion = new Question(question);
-    try {
-      currentQuestion.validate();
-    } catch (error) {
-      throw new CustomError("Validation Error", 400, error);
-    }
-    templateQuestions.push(currentQuestion);
+  const templateQuestions = questions.map((question) => {
+    console.log("question", question);
+    return {
+      question: question.question,
+      hasRange: question.hasRange,
+      hasSentence: question.hasSentence,
+      range: question.range,
+      sentenceAnswer: question.sentenceAnswer,
+    };
   });
 
   const newQuestionnaire = new Template({
@@ -128,9 +142,44 @@ const getTemplateQuestions = async (title) => {
   }
 };
 
+const addStudent = async (
+  teacherGoogleId,
+  firstName,
+  lastName,
+  email,
+  eventdate,
+  followupEmails
+) => {
+  const teacher = await getTeacherByGoogleId(teacherGoogleId);
+  const newStudent = new Student({
+    teacher: teacher._id,
+    firstName,
+    lastName,
+    email,
+    eventdate,
+    followupEmails,
+  });
+
+  try {
+    await newStudent.validate();
+  } catch (error) {
+    throw new CustomError("Validation Error", 400, error);
+  }
+
+  try {
+    await newStudent.save();
+    teacher.students.push(newStudent._id);
+    await teacher.save();
+    return newStudent;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
 export {
   createUser,
   createApprovedUser,
+  saveUser,
   approveUser,
   isUserApproved,
   getTeacherByGmail,

@@ -6,6 +6,7 @@ const StudentSchema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
+  eventdate: { type: Date, required: true },
   teacher: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
   questionnaires: [{ type: Schema.Types.ObjectId, ref: "Questionnaire" }],
   meetings: [

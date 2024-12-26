@@ -1,19 +1,24 @@
-import express from "express";
+import { Router } from "express";
+import checkAdmin from "../middleware/checkAdmin.js";
+import checkAuthenticated from "../middleware/checkAuthenticated.js";
 import {
   approveUser,
   createUserAndApprove,
-  getApprovedUsers,
+  getUsers,
   createTemplateQuestionnaire,
 } from "../controllers/adminController.js";
 
-const router = express.Router();
+const adminRouter = Router();
 
-router.post("/users", createUserAndApprove);
+// adminRouter.use(checkAuthenticated);
+adminRouter.use(checkAdmin);
 
-router.post("/users/:id/approve", approveUser);
+adminRouter.get("/users", getUsers);
 
-router.get("/users", getApprovedUsers);
+adminRouter.post("/users", createUserAndApprove);
 
-router.post("/template", createTemplateQuestionnaire);
+adminRouter.post("/:gmail/approve", approveUser);
 
-export default router;
+adminRouter.post("/template", createTemplateQuestionnaire);
+
+export default adminRouter;

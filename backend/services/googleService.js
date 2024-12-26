@@ -1,5 +1,6 @@
 import { google } from "googleapis";
 import { oauth2Client } from "../config/googleConfig.js";
+import { saveUser } from "./dbService.js";
 
 const scheduleCalendarEvent = async (user, event) => {
   try {
@@ -30,9 +31,9 @@ const getCalendarEvents = async (user) => {
 };
 
 const sendEmail = async (user, to, subject, message) => {
-  const oauth2Client = await validateAndRefreshToken(user);
+  const currentUser = await validateAndRefreshToken(user);
 
-  const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+  const gmail = google.gmail({ version: "v1", auth: currentUser });
 
   const email = [
     `To: ${to}`,
@@ -64,16 +65,23 @@ const getValidToken = async (refreshToken) => {
 };
 
 const validateAndRefreshToken = async (user) => {
-  oauth2Client.setCredentials({ refresh_token: user.refreshToken });
+  oauth2Client.setCredentials({
+    refresh_token: user.googleTokens.refreshToken,
+  });
 
-  const tokenInfo = await oauth2Client.getTokenInfo(user.accessToken);
+  const tokenInfo = await oauth2Client.getTokenInfo(
+    user.googleTokens.accessToken
+  );
   const expiryDate = tokenInfo.expiry_date;
   const currentTime = Date.now();
 
   if (expiryDate - currentTime < 5 * 60 * 1000) {
     const tokens = await oauth2Client.refreshAccessToken();
-    user.accessToken = tokens.credentials.access_token;
-    await user.save();
+    user.googleTokens.accessToken = tokens.credentials.access_token;
+    if (tokens.credentials.refresh_token) {
+      user.googleTokens.refreshToken = tokens.credentials.refresh_token;
+    }
+    await saveUser(user);
     oauth2Client.setCredentials({
       access_token: tokens.credentials.access_token,
     });

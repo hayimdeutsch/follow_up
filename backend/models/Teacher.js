@@ -8,7 +8,7 @@ const TeacherSchema = new Schema({
   email: { type: String, required: true, unique: true },
   approved: { type: Boolean, default: false },
   phone: String,
-  googleId: { type: String, required: true, unique: true },
+  googleId: { type: String, unique: true },
   students: [{ type: Schema.Types.ObjectId, ref: "Student" }],
   googleTokens: {
     accessToken: String,

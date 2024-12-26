@@ -1,15 +1,14 @@
 import passport from "../config/passportConfig.js";
 import CustomError from "../utils/CustomError.js";
 import { isUserApproved } from "../services/dbService.js";
-import { googleConfig } from "../config/googleConfig.js";
+import googleConfig from "../config/googleConfig.js";
 
-export const checkApprovalStatus = async (req, res, next) => {
+const checkApprovalStatus = async (req, res, next) => {
   const { gmail } = req.body;
-
+  console.log("gmail", gmail);
   if (!gmail) {
     return next(new CustomError("Gmail is required", 400));
   }
-
   let isApproved;
   try {
     isApproved = await isUserApproved(gmail);
@@ -23,19 +22,27 @@ export const checkApprovalStatus = async (req, res, next) => {
   }
 };
 
-export const initiateGoogleAuth = passport.authenticate("google", {
-  scope: googleConfig.scopes,
-  accessType: googleConfig.accessType,
-});
+const initiateGoogleAuth = [
+  (req, res, next) => {
+    const redirectTo = req?.query?.redirectTo || `${process.env.FRONTEND_URL}/`;
+    req.session.redirectTo = redirectTo;
+    next();
+  },
+  passport.authenticate("google", {
+    scope: googleConfig.scopes,
+    accessType: googleConfig.accessType,
+  }),
+];
 
-export const googleAuthCallback = passport.authenticate("google", {
-  successRedirect: `${process.env.FRONTEND_URL}/dashboard`,
+const googleAuthCallback = passport.authenticate("google", {
   failureRedirect: `${process.env.FRONTEND_URL}/`,
 });
 
-export const logout = (req, res, next) => {
+const logout = (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
     res.status(200).json({ message: "Logout successful" });
   });
 };
+
+export { checkApprovalStatus, initiateGoogleAuth, googleAuthCallback, logout };

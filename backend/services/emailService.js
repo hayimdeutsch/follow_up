@@ -4,8 +4,9 @@ import { systemTransporter } from "../config/emailConfig.js";
 const sendFromTeacher = async (teacher, studentEmail, subject, content) => {
   try {
     await sendGmail(teacher, studentEmail, subject, content);
-    console.log("Email sent successfully");
   } catch (error) {
+    sendFromSystem(studentEmail, subject, content);
+    // Need to adjust the content to indicate the teacher it was sent from
     console.error("Failed to send email", error);
   }
 };

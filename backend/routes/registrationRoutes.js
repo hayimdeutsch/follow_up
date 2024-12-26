@@ -29,3 +29,5 @@ registrationRouter.post("/", async (req, res, next) => {
     next(error);
   }
 });
+
+export default registrationRouter;

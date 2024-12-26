@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import QuestionSchema from "./Question";
+import QuestionSchema from "./Question.js";
 
 const { Schema } = mongoose;
 

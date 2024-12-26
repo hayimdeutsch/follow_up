@@ -3,39 +3,40 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import oauthConfig from "./googleConfig.js";
 import {
+  saveUser,
   getTeacherByGmail,
   getTeacherByGoogleId,
 } from "../services/dbService.js";
 
 passport.serializeUser((teacher, done) => {
   console.log("serializing teacher", teacher);
-  done(null, teacher.id);
+  done(null, teacher.googleId);
 });
 
-passport.deserializeUser((id, done) => {
-  console.log("deserializing teacher id", id);
-  done(null, id);
-});
-
-// passport.deserializeUser(async (id, done) => {
-//   try {
-//     const teacher = await Teacher.findById(id);
-//     done(null, teacher);
-//   } catch (error) {
-//     done(error);
-//   }
-//   console.log("deserializing user id", id);
-//   done(null, id);
+// passport.deserializeUser((teacher, done) => {
+//   console.log("deserializing teacher", teacher);
+//   done(null, teacher);
 // });
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const teacher = await getTeacherByGoogleId(id);
+    console.log("deserializing teacher", teacher);
+    done(null, teacher);
+  } catch (error) {
+    done(error);
+  }
+});
 
 passport.use(
   new GoogleStrategy(
-    oauthConfig.google,
+    oauthConfig,
     async (accessToken, refreshToken, profile, done) => {
       try {
         let teacher = await getTeacherByGoogleId(profile.id);
         if (!teacher) {
           teacher = await getTeacherByGmail(profile.emails[0].value);
+          console.log("teacher before tokens saved", teacher);
           teacher.googleId = profile.id;
           teacher.googleTokens = {
             accessToken,
@@ -44,7 +45,8 @@ passport.use(
         } else {
           teacher.googleTokens.accessToken = accessToken;
         }
-        await teacher.save();
+        console.log("teacher with tokens", teacher);
+        await saveUser(teacher);
         done(null, teacher);
       } catch (error) {
         done(error);
