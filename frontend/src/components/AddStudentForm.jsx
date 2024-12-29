@@ -5,39 +5,37 @@ const AddStudentForm = ({ teacher }) => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [eventDate, setEventDate] = useState("");
-  const [followUps, setFollowUps] = useState([{ time: "2 months" }]);
+  const [followUpEmails, setFollowUpEmails] = useState([{ scheduledDate: "" }]);
   const [error, setError] = useState("");
 
   const handleAddFollowUp = () => {
-    setFollowUps([...followUps, { time: "2 months" }]);
+    setFollowUpEmails([...followUpEmails, { scheduledDate: "" }]);
   };
 
   const handleFollowUpChange = (index, value) => {
-    const newFollowUps = followUps.map((followUp, i) =>
-      i === index ? { time: value } : followUp
+    const newFollowUpEmails = followUpEmails.map((followUp, i) =>
+      i === index ? { scheduledDate: value } : followUp
     );
-    setFollowUps(newFollowUps);
+    setFollowUpEmails(newFollowUpEmails);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `http://localhost:3000/${teacher}/students`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            firstName,
-            lastName,
-            email,
-            eventDate,
-            followUps,
-          }),
-        }
-      );
+      const response = await fetch(`http://localhost:3000/teachers/students`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          eventDate,
+          followUpEmails,
+        }),
+      });
       if (response.ok) {
         alert("Student added successfully");
         // Clear the form
@@ -45,7 +43,7 @@ const AddStudentForm = ({ teacher }) => {
         setLastName("");
         setEmail("");
         setEventDate("");
-        setFollowUps([{ time: "2 months" }]);
+        setFollowUpEmails([{ scheduledDate: "" }]);
       } else {
         setError("Failed to add student");
       }
@@ -93,18 +91,15 @@ const AddStudentForm = ({ teacher }) => {
         />
       </div>
       <div>
-        <label>Follow Ups:</label>
-        {followUps.map((followUp, index) => (
+        <label>Follow Up Emails:</label>
+        {followUpEmails.map((followUp, index) => (
           <div key={index}>
-            <select
-              value={followUp.time}
+            <input
+              type="date"
+              value={followUp.scheduledDate}
               onChange={(e) => handleFollowUpChange(index, e.target.value)}
               required
-            >
-              <option value="2 months">2 months</option>
-              <option value="6 months">6 months</option>
-              <option value="1 year">1 year</option>
-            </select>
+            />
           </div>
         ))}
         <button type="button" onClick={handleAddFollowUp}>

@@ -54,6 +54,33 @@ Content-Type: application/json
         "min": 1,
         "max": 10
       }
+    },
+    {
+      "question": "What is your favorite color?",
+      "hasRange": false,
+      "hasSentence": false
+    }
+  ]
+}
+
+###
+POST http://localhost:3000/chayimdeutsch@gmail.com/students
+Content-Type: application/json
+
+{
+  "firstName": "First",
+  "lastName": "Student",
+  "phone": "123-456-7890",
+  "gmail": "firstStudent@first.com",
+  "followUpEmails": [
+    {
+      "scheduledDate": "2025-06-01"
+    },
+    {
+      "scheduledDate": "2025-06-02"
+    },
+    {
+      "scheduledDate": "2025-06-03"
     }
   ]
 }

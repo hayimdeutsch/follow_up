@@ -52,7 +52,7 @@ const saveUser = async (user) => {
 };
 
 const approveUser = async (gmail) => {
-  console.log(gmail);
+  // console.log(gmail);
   try {
     const user = await Teacher.findOneAndUpdate(
       { email: gmail },
@@ -73,10 +73,19 @@ const isUserApproved = async (gmail) => {
   }
 };
 
+const getTeacherById = async (id) => {
+  try {
+    const teacher = await Teacher.findById(id);
+    return teacher;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
 const getTeacherByGmail = async (gmail) => {
   try {
     const teacher = await Teacher.findOne({ email: gmail });
-    console.log("teacher", teacher);
+    // console.log("teacher", teacher);
     return teacher;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
@@ -86,7 +95,7 @@ const getTeacherByGmail = async (gmail) => {
 const getTeacherByGoogleId = async (googleId) => {
   try {
     const teacher = await Teacher.findOne({ googleId: googleId });
-    console.log("teacher", teacher);
+    // console.log("teacher", teacher);
     return teacher;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
@@ -143,16 +152,16 @@ const getTemplateQuestions = async (title) => {
 };
 
 const addStudent = async (
-  teacherGoogleId,
+  teacherId,
   firstName,
   lastName,
   email,
   eventdate,
   followupEmails
 ) => {
-  const teacher = await getTeacherByGoogleId(teacherGoogleId);
+  console.log("followUpEmails: ", followupEmails);
   const newStudent = new Student({
-    teacher: teacher._id,
+    teacher: teacherId,
     firstName,
     lastName,
     email,
@@ -168,12 +177,40 @@ const addStudent = async (
 
   try {
     await newStudent.save();
-    teacher.students.push(newStudent._id);
-    await teacher.save();
+    await addStudentToTeacher(teacherId, newStudent);
     return newStudent;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
+};
+
+const getStudentById = async (studentId) => {
+  try {
+    const student = await Student.findById(studentId);
+    return student;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const getStudents = async (teacherId) => {
+  try {
+    const teacher = await Teacher.findOne(
+      { googleId: teacherId },
+      { students: 1, _id: 0 }
+    )
+      .populate("students")
+      .exec();
+    return teacher;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const addStudentToTeacher = async (teacherId, student) => {
+  const teacher = await Teacher.findById(teacherId);
+  teacher.students.push(student._id);
+  await teacher.save();
 };
 
 export {
@@ -182,9 +219,13 @@ export {
   saveUser,
   approveUser,
   isUserApproved,
+  getTeacherById,
   getTeacherByGmail,
   getTeacherByGoogleId,
   getAllTeachers,
   createTemplate,
   getTemplateQuestions,
+  addStudent,
+  getStudents,
+  getStudentById,
 };

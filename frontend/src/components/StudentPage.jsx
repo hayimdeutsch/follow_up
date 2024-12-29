@@ -1,35 +1,70 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const StudentPage = () => {
-  const { workerId, customerId } = useParams();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { studentId } = useParams();
+  const [student, setStudent] = useState(null);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const hasFetched = useRef(false);
 
   useEffect(() => {
-    fetch("/api/check-auth")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.authenticated) {
-          setIsAuthenticated(true);
+    const fetchStudent = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/teachers/students/${studentId}`,
+          {
+            credentials: "include",
+          }
+        );
+        if (response.ok) {
+          const studentData = await response.json();
+          setStudent(studentData.student);
         } else {
-          window.location.href = `/auth/google?returnTo=${window.location.pathname}`;
+          if (response.status === 401) {
+            const currentUrl = window.location.href;
+            console.log(
+              "printing current url from Student Page component",
+              currentUrl
+            );
+            navigate(`/login?redirectUrl=${encodeURIComponent(currentUrl)}`);
+          } else {
+            setError("Failed to fetch student");
+          }
         }
-      });
-  }, []);
+      } catch (error) {
+        setError("Error: " + error.message);
+      }
+    };
+
+    if (!hasFetched.current) {
+      fetchStudent();
+      hasFetched.current = true;
+    }
+  }, [studentId, navigate]);
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!student) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <>
-      {isAuthenticated ? (
-        <div>
-          <h1>
-            Customer Page for Worker {workerId} and Customer {customerId}
-          </h1>
-          {/* Display customer details here */}
-        </div>
-      ) : (
-        <div>Loading...</div>
-      )}
-    </>
+    <div>
+      <h1>
+        {student.firstName} {student.lastName}
+      </h1>
+      <p>Email: {student.email}</p>
+      <p>Event Date: {new Date(student.eventdate).toDateString()}</p>
+      <h2>Follow Up Emails</h2>
+      <ul>
+        {student.followupEmails.map((followUp, index) => (
+          <li key={index}>{new Date(followUp.scheduledDate).toDateString()}</li>
+        ))}
+      </ul>
+    </div>
   );
 };
 

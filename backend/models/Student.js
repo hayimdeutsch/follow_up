@@ -17,7 +17,6 @@ const StudentSchema = new Schema({
   ],
   followupEmails: [
     {
-      type: { type: String, enum: ["2month", "6month", "1year"] },
       scheduledDate: Date,
       status: {
         type: String,

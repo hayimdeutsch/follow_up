@@ -5,7 +5,7 @@ import googleConfig from "../config/googleConfig.js";
 
 const checkApprovalStatus = async (req, res, next) => {
   const { gmail } = req.body;
-  console.log("gmail", gmail);
+  // console.log("gmail", gmail);
   if (!gmail) {
     return next(new CustomError("Gmail is required", 400));
   }
@@ -22,21 +22,46 @@ const checkApprovalStatus = async (req, res, next) => {
   }
 };
 
-const initiateGoogleAuth = [
-  (req, res, next) => {
-    const redirectTo = req?.query?.redirectTo || `${process.env.FRONTEND_URL}/`;
-    req.session.redirectTo = redirectTo;
+const saveRedirectToSession = (req, res, next) => {
+  const returnURL = decodeURIComponent(req?.query?.returnTo);
+  const redirectTo = returnURL || `${process.env.FRONTEND_URL}/`;
+  req.session.redirect = redirectTo;
+  req.session.save((err) => {
+    if (err) {
+      return next(err);
+    }
     next();
-  },
-  passport.authenticate("google", {
-    scope: googleConfig.scopes,
-    accessType: googleConfig.accessType,
-  }),
-];
+  });
+};
 
-const googleAuthCallback = passport.authenticate("google", {
-  failureRedirect: `${process.env.FRONTEND_URL}/`,
+const initiateGoogleAuth = passport.authenticate("google", {
+  scope: googleConfig.scopes,
+  accessType: googleConfig.accessType,
 });
+
+const googleAuthCallbackRedirect = (req, res, next) => {
+  const redirectTo = req.session.redirect || `${process.env.FRONTEND_URL}/`;
+  console.log("req.session before passport.authenticate", req.session);
+
+  passport.authenticate("google", (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.redirect(`${process.env.FRONTEND_URL}/`);
+    }
+
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+
+      console.log("req.session after passport.authenticate", req.session);
+
+      res.redirect(redirectTo);
+    });
+  })(req, res, next);
+};
 
 const logout = (req, res, next) => {
   req.logout((err) => {
@@ -45,4 +70,19 @@ const logout = (req, res, next) => {
   });
 };
 
-export { checkApprovalStatus, initiateGoogleAuth, googleAuthCallback, logout };
+const getUser = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    res.json(req.user);
+  } else {
+    next(new CustomError("Not authenticated", 401));
+  }
+};
+
+export {
+  checkApprovalStatus,
+  saveRedirectToSession,
+  initiateGoogleAuth,
+  googleAuthCallbackRedirect,
+  logout,
+  getUser,
+};

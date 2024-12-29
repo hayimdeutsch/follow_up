@@ -2,23 +2,30 @@ import express from "express";
 import {
   viewStudents,
   viewStudentById,
-  addStudent,
+  addNewStudent,
+  updateStudent,
   createQuestionnaire,
+  scheduleMeeting,
   sendEmail,
 } from "../controllers/teacherController.js";
+import checkAuthenticated from "../middleware/checkAuthenticated.js";
 
-const router = express.Router();
+const teacherRouter = express.Router();
 
-router.get("/students", viewStudents);
+teacherRouter.use(checkAuthenticated);
 
-router.post("/students", addStudent);
+teacherRouter.post("/students", addNewStudent);
 
-router.get("/students/:id", viewStudentById);
+teacherRouter.get("/students", viewStudents);
 
-router.post("/students/:id/meetings", createMeeting);
+teacherRouter.get("/students/:studentId", viewStudentById);
 
-router.post("/students/:id/questionnaires", createQuestionnaire);
+teacherRouter.put("/students/:studentId", updateStudent);
 
-router.post("/emails", sendEmail);
+teacherRouter.post("/students/:studentId/questionnaires", createQuestionnaire);
 
-export default router;
+teacherRouter.post("/students/:studentId/meetings", scheduleMeeting);
+
+teacherRouter.post("/emails", sendEmail);
+
+export default teacherRouter;

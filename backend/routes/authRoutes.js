@@ -1,29 +1,23 @@
 import { Router } from "express";
-import redirect from "../middleware/redirect.js";
 import {
   checkApprovalStatus,
+  saveRedirectToSession,
   initiateGoogleAuth,
-  googleAuthCallback,
+  googleAuthCallbackRedirect,
   logout,
+  getUser,
 } from "../controllers/authController.js";
-import passport from "../config/passportConfig.js";
 
 const authRouter = Router();
 
 authRouter.post("/check-approval", checkApprovalStatus);
 
-authRouter.get("/google", initiateGoogleAuth);
+authRouter.get("/google", saveRedirectToSession, initiateGoogleAuth);
 
-authRouter.get("/google/callback", googleAuthCallback, redirect);
+authRouter.get("/google/callback", googleAuthCallbackRedirect);
 
 authRouter.get("/logout", logout);
 
-authRouter.get("/user", (req, res) => {
-  if (req.isAuthenticated()) {
-    res.json(req.user);
-  } else {
-    res.status(401).json({ message: "Not authenticated" });
-  }
-});
+authRouter.get("/user", getUser);
 
 export default authRouter;

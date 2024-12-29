@@ -27,7 +27,7 @@ const GoogleLoginButton = ({ redirectUrl }) => {
       if (response.ok) {
         window.location.href = loginUrl;
       } else {
-        setError("Login failed");
+        setError("Account not yet approved");
         console.error("Login failed, your account is not approved");
       }
     } catch (error) {
