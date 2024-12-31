@@ -1,0 +1,100 @@
+### - Create a template - should succeed on first attempt, fail on second attempt
+POST http://localhost:3000/templates
+Content-Type: application/json
+
+{
+  "title": "First Template",
+  "description": "This is the first template",
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": true
+    },
+    {
+      "question": "What is your birthday?",
+      "hasRange": false,
+      "hasSentence": true
+    },
+    {
+      "question": "From 1-10, how happy are you?",
+      "hasRange": true,
+      "hasSentence": false,
+      "range": {
+        "min": 1,
+        "max": 10
+      }
+    }
+  ]
+}
+
+### template with different title - should succeed on first attempt, fail on second attempt
+POST http://localhost:3000/templates
+Content-Type: application/json
+
+{
+  "title": "Second Template",
+  "description": "This is the second template",
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": true
+    }
+  ]
+}
+
+### template with no valid question type - should fail
+POST http://localhost:3000/templates
+Content-Type: application/json
+
+{
+  "title": "Template with invalid Question",
+  "description": "This is the second template",
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": false
+    }
+  ]
+}
+
+### template with no questions - should fail
+POST http://localhost:3000/templates
+Content-Type: application/json
+
+{
+  "title": "Template with no questions",
+  "description": "This is the second template"
+}
+
+### template with no title - should fail
+POST http://localhost:3000/templates
+Content-Type: application/json
+
+{
+  "description": "This is the second template",
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": true
+    }
+  ]
+}
+
+### template with no description - should fail
+POST http://localhost:3000/templates
+Content-Type: application/json
+
+{
+  "title": "Template with no description",
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": true
+    }
+  ]
+}

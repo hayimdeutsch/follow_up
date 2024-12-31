@@ -4,7 +4,7 @@ import QuestionSchema from "./Question.js";
 const { Schema } = mongoose;
 
 const TemplateSchema = new Schema({
-  title: { type: String, required: true },
+  title: { type: String, required: true, unique: true },
   description: String,
   questions: [QuestionSchema],
 });

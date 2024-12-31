@@ -1,4 +1,25 @@
-router.post("/templates", adminAuth, createTemplate);
-router.get("/templates", teacherAuth, getTemplates);
-router.put("/templates/:id", adminAuth, updateTemplate);
-router.delete("/templates/:id", adminAuth, deleteTemplate);
+import express from "express";
+import {
+  createTemplate,
+  getTemplates,
+  getTemplateQuestions,
+  updateTemplate,
+  deleteTemplate,
+} from "../controllers/templateController.js";
+import checkAdmin from "../middleware/checkAdmin.js";
+import checkAuthenticated from "../middleware/checkAuthenticated.js";
+
+const templateRouter = express.Router();
+
+//templateRouter.use(checkAuthenticated);
+
+templateRouter.get("/", getTemplates);
+
+//templateRouter.use(checkAdmin);
+
+templateRouter.post("/", createTemplate);
+templateRouter.get("/:id", getTemplateQuestions);
+templateRouter.put("/:id", updateTemplate);
+templateRouter.delete("/:id", deleteTemplate);
+
+export default templateRouter;
