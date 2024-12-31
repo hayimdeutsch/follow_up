@@ -1,7 +1,7 @@
 import express from "express";
 import {
   viewStudents,
-  viewStudentById,
+  viewStudentBySudentIdParam,
   addNewStudent,
   updateStudent,
   createQuestionnaire,
@@ -18,7 +18,7 @@ teacherRouter.post("/students", addNewStudent);
 
 teacherRouter.get("/students", viewStudents);
 
-teacherRouter.get("/students/:studentId", viewStudentById);
+teacherRouter.get("/students/:studentId", viewStudentBySudentIdParam);
 
 teacherRouter.put("/students/:studentId", updateStudent);
 

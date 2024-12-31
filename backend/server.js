@@ -9,6 +9,7 @@ import authRouter from "./routes/authRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 import registrationRouter from "./routes/registrationRoutes.js";
 import teacherRouter from "./routes/teacherRoutes.js";
+import templateRouter from "./routes/templateRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import connectDB from "./config/dbConfig.js";
 
@@ -43,6 +44,7 @@ app.use("/auth", authRouter);
 app.use("/admin", adminRouter);
 app.use("/register", registrationRouter);
 app.use("/teachers", teacherRouter);
+app.use("/templates", templateRouter);
 app.use("/test", testRouter);
 
 app.use(errorHandler);

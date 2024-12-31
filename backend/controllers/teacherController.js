@@ -1,25 +1,20 @@
-import {
-  addStudent,
-  getTeacherByGmail,
-  getStudents,
-  getStudentById,
-} from "../services/dbService.js";
+import * as dbService from "../services/dbService.js";
 import CustomError from "../utils/CustomError.js";
 
 const viewStudents = async (req, res, next) => {
   try {
-    const studentsObject = await getStudents(req.user.googleId);
+    const studentsObject = await dbService.getStudents(req.user.googleId);
     res.status(200).json({ students: studentsObject.students });
   } catch (error) {
     next(error);
   }
 };
 
-const viewStudentById = async (req, res, next) => {
+const viewStudentBySudentIdParam = async (req, res, next) => {
   console.log("req.params: ", req.params);
   const { studentId } = req.params;
   try {
-    const student = await getStudentById(studentId);
+    const student = await dbService.getStudentById(studentId);
     res.status(200).json({ student });
   } catch (error) {
     next(error);
@@ -30,11 +25,11 @@ const addNewStudent = async (req, res, next) => {
   if (req.isAuthenticated()) {
     console.log("req.user: ", req.user);
     try {
-      const teacher = await getTeacherByGmail(req.user.email);
+      const teacher = await dbService.getTeacherByGmail(req.user.email);
       const { firstName, lastName, email, eventDate, followUpEmails } =
         req.body;
       console.log("followUpEmails: ", followUpEmails);
-      await addStudent(
+      await dbService.addStudent(
         teacher,
         firstName,
         lastName,
@@ -85,7 +80,7 @@ const updateStudent = async (req, res, next) => {
 
 export {
   viewStudents,
-  viewStudentById,
+  viewStudentBySudentIdParam,
   addNewStudent,
   createQuestionnaire,
   scheduleMeeting,

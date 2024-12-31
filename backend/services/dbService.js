@@ -3,6 +3,7 @@ import Question from "../models/Question.js";
 import Template from "../models/Template.js";
 import CustomError from "../utils/CustomError.js";
 import Student from "../models/Student.js";
+import mongoose from "mongoose";
 
 const createUser = async (firstName, lastName, gmail, phone) => {
   const newUser = new Teacher({ firstName, lastName, email: gmail, phone });
@@ -52,7 +53,6 @@ const saveUser = async (user) => {
 };
 
 const approveUser = async (gmail) => {
-  // console.log(gmail);
   try {
     const user = await Teacher.findOneAndUpdate(
       { email: gmail },
@@ -85,7 +85,6 @@ const getTeacherById = async (id) => {
 const getTeacherByGmail = async (gmail) => {
   try {
     const teacher = await Teacher.findOne({ email: gmail });
-    // console.log("teacher", teacher);
     return teacher;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
@@ -134,18 +133,52 @@ const createTemplate = async (title, description, questions) => {
   } catch (error) {
     throw new CustomError("Validation Error", 400, error);
   }
+
   try {
     await newQuestionnaire.save();
     return newQuestionnaire;
   } catch (error) {
-    throw new Error("Error creating questionnaire: " + error.message);
+    if (error instanceof mongoose.Error.ValidationError) {
+      throw new CustomError("Validation Error", 400, error);
+    } else if (error.code === 11000) {
+      throw new CustomError("Template title already exists", 400);
+    } else {
+      throw new CustomError("DB Error", 500, error);
+    }
   }
 };
 
-const getTemplateQuestions = async (title) => {
+const getAllTemplates = async () => {
+  try {
+    const questionnaires = await Template.find();
+    return questionnaires;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const getTemplateByTitle = async (title) => {
   try {
     const template = await Template.findOne({ title });
-    return template.questions;
+    return template;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const updateTemplateByTitle = async (title, questions) => {
+  try {
+    const template = await Template.findOneAndUpdate({ title }, { questions });
+    return template;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const deleteTemplateByTitle = async (title) => {
+  try {
+    const template = await Template.findOneAndDelete({ title });
+    return template;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
@@ -224,7 +257,10 @@ export {
   getTeacherByGoogleId,
   getAllTeachers,
   createTemplate,
-  getTemplateQuestions,
+  getAllTemplates,
+  getTemplateByTitle,
+  updateTemplateByTitle,
+  deleteTemplateByTitle,
   addStudent,
   getStudents,
   getStudentById,

@@ -1,24 +1,21 @@
 import passport from "../config/passportConfig.js";
 import CustomError from "../utils/CustomError.js";
-import { isUserApproved } from "../services/dbService.js";
+import * as dbService from "../services/dbService.js";
 import googleConfig from "../config/googleConfig.js";
 
 const checkApprovalStatus = async (req, res, next) => {
-  const { gmail } = req.body;
-  // console.log("gmail", gmail);
-  if (!gmail) {
-    return next(new CustomError("Gmail is required", 400));
-  }
-  let isApproved;
   try {
-    isApproved = await isUserApproved(gmail);
+    const { gmail } = req.body;
+    if (!gmail) {
+      throw new CustomError("Gmail is required", 400);
+    }
+    const isApproved = await dbService.isUserApproved(gmail);
+    if (!isApproved) {
+      throw new CustomError("User not yet approved", 401);
+    }
+    res.status(200).json({ message: "User is approved" });
   } catch (error) {
-    return next(error);
-  }
-  if (isApproved) {
-    return res.status(200).json({ message: "User is approved" });
-  } else {
-    next(new CustomError("User not yet approved", 401));
+    next(error);
   }
 };
 
