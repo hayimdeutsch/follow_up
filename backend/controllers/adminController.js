@@ -1,6 +1,18 @@
 import CustomError from "../utils/CustomError.js";
 import * as dbService from "../services/dbService.js";
 
+const checkAdminForLogin = async (req, res, next) => {
+  try {
+    const { gmail } = req.body;
+    if (gmail !== process.env.ADMIN_EMAIL) {
+      throw new CustomError("Forbidden", 403);
+    }
+    res.status(200).json({ message: "Admin approved" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getUsers = async (req, res, next) => {
   try {
     const teachers = await dbService.getAllTeachers();
@@ -24,23 +36,6 @@ const approveUser = async (req, res, next) => {
   }
 };
 
-const createTemplateQuestionnaire = async (req, res, next) => {
-  const { title, description, questions } = req.body;
-  if (!title || !description || !questions) {
-    return next(new CustomError("Missing required fields", 400));
-  }
-  try {
-    const templateQuestionnaire = await dbService.createTemplate(
-      title,
-      description,
-      questions
-    );
-    res.status(201).json(templateQuestionnaire);
-  } catch (error) {
-    next(error);
-  }
-};
-
 const createUserAndApprove = async (req, res, next) => {
   const { name, email } = req.body;
   try {
@@ -51,9 +46,4 @@ const createUserAndApprove = async (req, res, next) => {
   }
 };
 
-export {
-  getUsers,
-  approveUser,
-  createTemplateQuestionnaire,
-  createUserAndApprove,
-};
+export { getUsers, approveUser, createUserAndApprove, checkAdminForLogin };

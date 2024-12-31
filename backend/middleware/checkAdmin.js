@@ -2,10 +2,8 @@ import "dotenv/config.js";
 import CustomError from "../utils/CustomError.js";
 
 export default (req, res, next) => {
-  return next();
-  if (req.user.email === process.env.ADMIN_EMAIL) {
-    return next();
+  if (req.user.email !== process.env.ADMIN_EMAIL) {
+    throw new CustomError("Forbidden", 403);
   }
-  throw new CustomError("Forbidden", 403);
-  res.status(403).json({ message: "Forbidden" });
+  return next();
 };

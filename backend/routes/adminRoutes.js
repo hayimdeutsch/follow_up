@@ -5,12 +5,15 @@ import {
   approveUser,
   createUserAndApprove,
   getUsers,
-  createTemplateQuestionnaire,
+  checkAdminForLogin,
 } from "../controllers/adminController.js";
 
 const adminRouter = Router();
 
-// adminRouter.use(checkAuthenticated);
+adminRouter.post("/check-admin", checkAdminForLogin);
+
+adminRouter.use(checkAuthenticated);
+
 adminRouter.use(checkAdmin);
 
 adminRouter.get("/users", getUsers);
@@ -18,7 +21,5 @@ adminRouter.get("/users", getUsers);
 adminRouter.post("/users", createUserAndApprove);
 
 adminRouter.post("/:gmail/approve", approveUser);
-
-adminRouter.post("/template", createTemplateQuestionnaire);
 
 export default adminRouter;
