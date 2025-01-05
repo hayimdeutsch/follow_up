@@ -98,3 +98,42 @@ Content-Type: application/json
     }
   ]
 }
+
+### update a template - should succeed on first attempt
+PUT http://localhost:3000/templates/First%20Template
+Content-Type: application/json
+
+{
+  "title": "First Template",
+  "description": "This is the first template",
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": true
+    },
+    {
+      "question": "What is your birthday?",
+      "hasRange": false,
+      "hasSentence": true
+    },
+    {
+      "question": "From 1-10, how happy are you?",
+      "hasRange": true,
+      "hasSentence": false,
+      "range": {
+        "min": 1,
+        "max": 10
+      }
+    },
+    {
+      "question": "What is your favorite color?",
+      "hasRange": false,
+      "hasSentence": true
+    }
+  ]
+}
+
+### delete a template - should succeed on first attempt
+DELETE http://localhost:3000/templates/Second%20Template
+```

@@ -1,25 +1,6 @@
-export const getFollowUpTemplate = (student, emailType) => {
-  const templates = {
-    "2month": `
-      <h1>2 Month Follow-up</h1>
-      <p>Dear ${student.firstName},</p>
-      ...
-    `,
-    "6month": `
-      <h1>6 Month Follow-up</h1>
-      <p>Dear ${student.firstName},</p>
-      ...
-    `,
-    "1year": `
-      <h1>1 Year Follow-up</h1>
-      <p>Dear ${student.firstName},</p>
-      ...
-    `,
-  };
-  return templates[emailType];
-};
+import "dotenv/config";
 
-export const newUserApplicationTemplate = (user) => {
+const newUserApplicationTemplate = (user) => {
   return `
     <p>Dear Admin,</p>
     <p>A new user has applied and is pending approval in your dashboard.</p>
@@ -30,10 +11,24 @@ export const newUserApplicationTemplate = (user) => {
       <li><strong>Phone:</strong> ${user.phone}</li>
     </ul>
 <p>Please review the application and take the necessary actions.</p>
-    <form action="http://localhost:3000/admin/users/${user.email}/approve" method="post">
-      <button type="submit">Click here to approve the user</button>
-    </form>
+    <a href="${process.env.FRONTEND_URL}/admin/dashboard" target="_blank">Click here to view all users</a>
     <p>Thank you.</p>
   `;
-  // Need to add the actual link to the admin dashboard
 };
+
+const followupTemplate = (message, token) => {
+  const body = `${
+    teacherMessage
+      ? `<p>${teacherMessage}</p>`
+      : `<p>Hi ${studentFirstName},</p>
+    <p>At your earliest convenience, please fill out the following questionnaire as a follow up to our classes.</p>`
+  }
+    <a href="${
+      process.env.FRONTEND_URL
+    }/questionnaires/${token}">Click here to fill out the questionnaire</a>
+    <p>All the best,</p>
+    <p>${teacherName}</p>`;
+  return message;
+};
+
+export { followupTemplate, newUserApplicationTemplate };

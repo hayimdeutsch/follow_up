@@ -22,7 +22,6 @@ passport.use(
             });
           }
 
-          // console.log("teacher before tokens saved", teacher);
           teacher.googleId = profile.id;
           teacher.googleTokens = {
             accessToken,
@@ -31,7 +30,6 @@ passport.use(
         } else {
           teacher.googleTokens.accessToken = accessToken;
         }
-        // console.log("teacher with tokens", teacher);
         await saveUser(teacher);
         done(null, teacher);
       } catch (error) {
@@ -42,7 +40,6 @@ passport.use(
 );
 
 passport.serializeUser((teacher, done) => {
-  // console.log("serializing teacher", teacher);
   done(null, teacher.googleId);
 });
 

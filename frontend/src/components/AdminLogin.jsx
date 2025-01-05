@@ -15,7 +15,6 @@ const AdminLogin = ({ onClose }) => {
         body: JSON.stringify({ email }),
       });
       if (response.ok) {
-        alert("Admin logged in successfully!");
         onClose();
       } else {
         alert("Failed to log in as admin");

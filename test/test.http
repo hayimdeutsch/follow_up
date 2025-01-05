@@ -2,10 +2,10 @@ POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "firstName": "John",
-  "lastName": "Doe",
+  "firstName": "Toby",
+  "lastName": "Deutsch",
   "phone": "123-456-7890",
-  "gmail": "chayimdeutsch@gmail.com"
+  "gmail": "tobysdeutsch@gmail.com"
 }
 
 ###
@@ -29,42 +29,7 @@ GET http://localhost:3000/test
 GET http://localhost:3000/admin/users
 
 ###
-POST http://localhost:3000/admin/template
-Content-Type: application/json
-
-{
-  "title": "First Template",
-  "description": "This is the first template",
-  "questions": [
-    {
-      "question": "What is your name?",
-      "hasRange": false,
-      "hasSentence": true
-    },
-    {
-      "question": "What is your birthday?",
-      "hasRange": false,
-      "hasSentence": true
-    },
-    {
-      "question": "From 1-10, how happy are you?",
-      "hasRange": true,
-      "hasSentence": false,
-      "range": {
-        "min": 1,
-        "max": 10
-      }
-    },
-    {
-      "question": "What is your favorite color?",
-      "hasRange": false,
-      "hasSentence": false
-    }
-  ]
-}
-
-###
-POST http://localhost:3000/chayimdeutsch@gmail.com/students
+POST http://localhost:3000/teachers/students
 Content-Type: application/json
 
 {

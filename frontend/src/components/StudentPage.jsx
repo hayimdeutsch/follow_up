@@ -117,7 +117,6 @@ const StudentPage = () => {
   const handleAddQuestionnaire = () => {
     const token = Math.floor(Math.random() * 1000000);
     console.log("New Questionnaire Token:", token);
-    // Navigate to the questionnaire page with the token as a query parameter
     navigate(`questionnaire?token=${token}`);
   };
 

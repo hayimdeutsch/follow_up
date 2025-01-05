@@ -164,20 +164,22 @@
 // export default Questionnaire;
 
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import Question from "./Question";
 import QuestionForm from "./QuestionForm";
 import TemplateSelector from "./TemplateSelector";
 
 const Questionnaire = () => {
-  const { studentID } = useParams();
+  const { studentId } = useParams();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
   const [title, setTitle] = useState("");
   const [questions, setQuestions] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
 
   useEffect(() => {
-    // Fetch available templates from the backend
+    setTitle(`Questionnaire for Student ${studentId}`);
     fetch("http://localhost:3000/templates", {
       credentials: "include",
     })
@@ -198,7 +200,6 @@ const Questionnaire = () => {
 
   useEffect(() => {
     if (selectedTemplate) {
-      // Fetch questions for the selected template
       fetch(`http://localhost:3000/templates/${selectedTemplate}`, {
         credentials: "include",
       })
@@ -228,13 +229,13 @@ const Questionnaire = () => {
 
   const handleSaveQuestionnaire = () => {
     const questionnaire = {
-      title,
       questions,
-      studentID,
+      token,
+      title,
     };
 
     // Save the questionnaire to the backend
-    fetch("http://localhost:3000/teachers/questionnaires", {
+    fetch(`http://localhost:3000/questionnaires/${studentId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -256,7 +257,7 @@ const Questionnaire = () => {
 
   return (
     <div>
-      <h1>Create Questionnaire for Student {studentID}</h1>
+      <h1>Create Questionnaire for Student {studentId}</h1>
       <input
         type="text"
         value={title}

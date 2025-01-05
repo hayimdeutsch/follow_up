@@ -10,10 +10,9 @@ import adminRouter from "./routes/adminRoutes.js";
 import registrationRouter from "./routes/registrationRoutes.js";
 import teacherRouter from "./routes/teacherRoutes.js";
 import templateRouter from "./routes/templateRoutes.js";
+import questionnaireRouter from "./routes/questionnaireRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import connectDB from "./config/dbConfig.js";
-
-import testRouter from "./routes/testRoutes.js";
 
 const app = express();
 
@@ -45,7 +44,7 @@ app.use("/admin", adminRouter);
 app.use("/register", registrationRouter);
 app.use("/teachers", teacherRouter);
 app.use("/templates", templateRouter);
-app.use("/test", testRouter);
+app.use("/questionnaires", questionnaireRouter);
 
 app.use(errorHandler);
 

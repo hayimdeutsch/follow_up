@@ -5,18 +5,20 @@ import StudentPage from "./components/StudentPage";
 import LoginPage from "./components/LoginPage";
 import PageNotFound from "./components/PageNotFound";
 import Questionnaire from "./components/Questionnaire";
+import StudentQuestionnaire from "./components/StudentQuestionnaire";
+
 const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" exact Component={HomePage} />
-        <Route path="/students/:studentId" exact Component={StudentPage} />
+        <Route path="/" Component={HomePage} />
+        <Route path="/students/:studentId" Component={StudentPage} />
         <Route
-          exact
           path="/students/:studentId/questionnaire"
           Component={Questionnaire}
         />
         <Route path="/login" Component={LoginPage} />
+        <Route path="/questionnaire/:token" Component={StudentQuestionnaire} />
         <Route path="*" Component={PageNotFound} />
       </Routes>
     </Router>

@@ -1,9 +1,15 @@
-// routes/questionnaire.routes.js
-router.post(
-  "/questionnaires/template/:templateId",
-  teacherAuth,
-  createFromTemplate
-);
-router.put("/questionnaires/:id", teacherAuth, updateQuestionnaire);
-router.get("/questionnaires/:token", submitQuestionnaire);
-router.post("/questionnaires/:token/submit", submitQuestionnaireResponse);
+import express from "express";
+import checkAuthenticated from "../middleware/checkAuthenticated.js";
+import {
+  createQuestionnaire,
+  getQuestionnaireByToken,
+  submitQuestionnaire,
+} from "../controllers/questionnaireController.js";
+
+const router = express.Router();
+
+router.post("/:studentId/", checkAuthenticated, createQuestionnaire);
+router.get("/:token/", getQuestionnaireByToken);
+router.put("/:token/", submitQuestionnaire);
+
+export default router;

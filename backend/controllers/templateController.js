@@ -30,7 +30,7 @@ const getTemplates = async (req, res, next) => {
 const getTemplateQuestions = async (req, res, next) => {
   try {
     const { id: title } = req.params;
-    const template = await dbService.getTemplate(title);
+    const template = await dbService.getTemplateByTitle(title);
     res.status(200).json({ questions: template.questions });
   } catch (error) {
     next(error);

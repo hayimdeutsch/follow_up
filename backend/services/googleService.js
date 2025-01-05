@@ -2,15 +2,18 @@ import { google } from "googleapis";
 import { oauth2Client } from "../config/googleConfig.js";
 import { saveUser } from "./dbService.js";
 
-const scheduleCalendarEvent = async (user, event) => {
+const scheduleCalendarEvent = async (user, eventObject) => {
   try {
     const currentUser = await validateAndRefreshToken(user);
     const calendar = google.calendar({ version: "v3", auth: currentUser });
-    const res = await calendar.events.insert({
+
+    const event = await calendar.events.insert({
       calendarId: "primary",
-      requestBody: event,
+      requestBody: eventObject,
+      conferenceDataVersion: 1,
     });
-    return res.data;
+
+    return event.data;
   } catch (error) {
     console.error("Error scheduling calendar event:", error);
     throw new Error("Failed to schedule calendar event");

@@ -11,11 +11,11 @@ import checkAuthenticated from "../middleware/checkAuthenticated.js";
 
 const templateRouter = express.Router();
 
-//templateRouter.use(checkAuthenticated);
+templateRouter.use(checkAuthenticated);
 
 templateRouter.get("/", getTemplates);
 
-//templateRouter.use(checkAdmin);
+templateRouter.use(checkAdmin);
 
 templateRouter.post("/", createTemplate);
 templateRouter.get("/:id", getTemplateQuestions);
