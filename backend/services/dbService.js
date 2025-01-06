@@ -1,10 +1,11 @@
-import mongoose, { now } from "mongoose";
+import mongoose, { get, now } from "mongoose";
 import Teacher from "../models/Teacher.js";
 import Questionnaire from "../models/Questionnaire.js";
 import Template from "../models/Template.js";
 import CustomError from "../utils/CustomError.js";
 import Student from "../models/Student.js";
 import Meeting from "../models/Meeting.js";
+import FollowUp from "../models/FollowUp.js";
 
 const createUser = async (firstName, lastName, gmail, phone) => {
   const newUser = new Teacher({ firstName, lastName, email: gmail, phone });
@@ -258,21 +259,19 @@ const createQuestionnaire = async (questionnaire) => {
   }
 };
 
-const getQuestionnaireByToken = async (token) => {
+const getQuestionnaireById = async (questionnaireId) => {
   try {
-    const questionnaire = await Questionnaire.findOne({ token });
+    const questionnaire = await Questionnaire.findById(questionnaireId);
     return questionnaire;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
 };
 
-const submitQuestionnaire = async (token, questions) => {
+const submitQuestionnaire = async (questionnaireId, questions) => {
   try {
-    const questionnaire = await Questionnaire.findOneAndUpdate(
-      {
-        token,
-      },
+    const questionnaire = await Questionnaire.findByIdAndUpdate(
+      questionnaireId,
       {
         $set: {
           questions,
@@ -306,26 +305,51 @@ const createMeeting = async (meeting) => {
   }
 };
 
-const getMeetingByToken = async (token) => {
+const getMeetingById = async (meetingId) => {
   try {
-    const meeting = await Meeting.findOne({ token }).populate([
-      "teacher",
-      "student",
-    ]);
+    const meeting = await Meeting.findById(meetingId);
     return meeting;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
 };
 
-const confirmMeeting = async (token, selectedTimeSlot, googleEventId) => {
+const confirmMeeting = async (meetingId, selectedTimeSlot, googleEventId) => {
   try {
-    const meeting = await Meeting.findOneAndUpdate(
-      { token },
+    const meeting = await Meeting.findByIdAndUpdate(
+      meetingId,
       { $set: { status: "confirmed", selectedTimeSlot, googleEventId } },
       { new: true }
     );
     return meeting;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const getFollowUpByToken = async (token) => {
+  try {
+    const followUp = await FollowUp.findOne({ token }).populate([
+      "questionnaire",
+      "meeting",
+      "teacher",
+      "student",
+    ]);
+    return followUp;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const submitFollowUp = async (token) => {
+  try {
+    await FollowUp.findOneAndUpdate(
+      { token },
+      { submitted: true, submittedAt: now() },
+      { new: true }
+    );
+    const followUp = await getFollowUpByToken(token);
+    return followUp;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
@@ -350,10 +374,12 @@ export {
   getStudents,
   getStudentById,
   createQuestionnaire,
-  getQuestionnaireByToken,
+  getQuestionnaireById,
   submitQuestionnaire,
   addQuestionnaireToStudent,
   createMeeting,
-  getMeetingByToken,
+  getMeetingById,
   confirmMeeting,
+  getFollowUpByToken,
+  submitFollowUp,
 };

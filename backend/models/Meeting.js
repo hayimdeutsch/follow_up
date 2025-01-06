@@ -3,8 +3,6 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const meetingSchema = new Schema({
-  teacher: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
-  student: { type: Schema.Types.ObjectId, ref: "Student", required: true },
   topic: { type: String, required: true },
   duration: { type: Number, required: true },
   timeSlots: [
@@ -23,7 +21,6 @@ const meetingSchema = new Schema({
     default: "awaiting_selection",
   },
   googleEventId: String,
-  token: { type: String, required: true },
 });
 
 const Meeting = mongoose.model("Meeting", meetingSchema);
