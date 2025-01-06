@@ -1,13 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const LogoutButton = () => {
+  const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       const response = await fetch("http://localhost:3000/auth/logout", {
         credentials: "include",
       });
       if (response.ok) {
-        window.location.href = "/";
+        navigate("/");
       } else {
         console.error("Logout failed");
       }

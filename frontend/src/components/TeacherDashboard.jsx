@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AddStudentForm from "./AddStudentForm";
 
-const DummyPage = ({ user }) => {
+const TeacherDashboard = ({ user }) => {
   const [students, setStudents] = useState([]);
   const [error, setError] = useState("");
 
@@ -31,7 +31,7 @@ const DummyPage = ({ user }) => {
 
   return (
     <div>
-      <h1>Welcome to the Dummy Page, {user}!</h1>
+      <h1>Welcome, {user}!</h1>
       <p>You are successfully signed in!</p>
       <AddStudentForm teacher={user} />
       <h2>Students</h2>
@@ -64,4 +64,4 @@ const DummyPage = ({ user }) => {
   );
 };
 
-export default DummyPage;
+export default TeacherDashboard;
