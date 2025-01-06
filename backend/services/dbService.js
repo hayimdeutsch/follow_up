@@ -327,6 +327,35 @@ const confirmMeeting = async (meetingId, selectedTimeSlot, googleEventId) => {
   }
 };
 
+const createFollowup = async (
+  token,
+  teacherId,
+  studentId,
+  meetingId,
+  questionnaireId
+) => {
+  const newFollowUp = new FollowUp({
+    token,
+    teacher: teacherId,
+    student: studentId,
+    meeting: meetingId,
+    questionnaire: questionnaireId,
+  });
+
+  try {
+    await newFollowUp.validate();
+  } catch (error) {
+    throw new CustomError("Validation Error", 400, error);
+  }
+
+  try {
+    await newFollowUp.save();
+    return newFollowUp;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
 const getFollowUpByToken = async (token) => {
   try {
     const followUp = await FollowUp.findOne({ token }).populate([
@@ -350,6 +379,16 @@ const submitFollowUp = async (token) => {
     );
     const followUp = await getFollowUpByToken(token);
     return followUp;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const addFollowupToStudent = async (studentId, followUp) => {
+  try {
+    const student = await Student.findById(studentId);
+    student.followUps.push(followUp._id);
+    await student.save();
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
@@ -380,6 +419,8 @@ export {
   createMeeting,
   getMeetingById,
   confirmMeeting,
+  createFollowup,
   getFollowUpByToken,
   submitFollowUp,
+  addFollowupToStudent,
 };

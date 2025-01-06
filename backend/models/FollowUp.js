@@ -6,8 +6,12 @@ const FollowUpSchema = new Schema({
   token: { type: String, required: true },
   student: { type: Schema.Types.ObjectId, ref: "Student" },
   teacher: { type: Schema.Types.ObjectId, ref: "Teacher" },
-  questionnaire: { type: Schema.Types.ObjectId, ref: "Questionnaire" },
-  meeting: { type: Schema.Types.ObjectId, ref: "Meeting" },
+  questionnaire: {
+    type: Schema.Types.ObjectId,
+    ref: "Questionnaire",
+    default: null,
+  },
+  meeting: { type: Schema.Types.ObjectId, ref: "Meeting", default: null },
   submitted: { type: Boolean, default: false },
   submittedAt: { type: Date },
 });

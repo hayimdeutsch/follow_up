@@ -38,10 +38,13 @@ const createFollowup = async (req, res, next) => {
 
     const followUp = await dbService.createFollowup(
       token,
+      teacher._id,
+      studentId,
       meetingId,
       questionnaireId
     );
-    await dbService.addFollowupToStudent(studentId, followUp);
+
+    await dbService.addFollowupToStudent(studentId, followUp._id);
 
     res.status(201).json(followUp);
   } catch (error) {
