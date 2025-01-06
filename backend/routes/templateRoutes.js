@@ -14,11 +14,11 @@ const templateRouter = express.Router();
 templateRouter.use(checkAuthenticated);
 
 templateRouter.get("/", getTemplates);
+templateRouter.get("/:id", getTemplateQuestions);
 
 templateRouter.use(checkAdmin);
 
 templateRouter.post("/", createTemplate);
-templateRouter.get("/:id", getTemplateQuestions);
 templateRouter.put("/:id", updateTemplate);
 templateRouter.delete("/:id", deleteTemplate);
 
