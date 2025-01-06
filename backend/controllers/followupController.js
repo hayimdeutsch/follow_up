@@ -1,6 +1,7 @@
 import dbService from "../services/dbService.js";
 import CustomError from "../utils/CustomError.js";
 import { scheduleCalendarEvent } from "../services/calendarService.js";
+import { sendFromTeacher } from "../services/emailService.js";
 
 const createFollowup = async (req, res, next) => {
   try {
@@ -65,9 +66,9 @@ const getFollowupByToken = async (req, res, next) => {
 const submitFollowup = async (req, res, next) => {
   try {
     const { token } = req.params;
-    const { questions, selectedTimeSlot } = req.body;
+    const { subject, emailText, questions, selectedTimeSlot } = req.body;
 
-    if (!questions && !selectedTimeSlot) {
+    if (!emailText || !subject || (!questions && !selectedTimeSlot)) {
       throw new CustomError("Missing required fields", 400);
     }
 
@@ -98,6 +99,13 @@ const submitFollowup = async (req, res, next) => {
     }
 
     const submittedFollowUp = await dbService.submitFollowup(token);
+
+    await sendFromTeacher(
+      followUp.teacher.email,
+      followUp.student.email,
+      subject,
+      emailText
+    );
 
     res.status(200).json(submittedFollowUp);
   } catch (error) {
