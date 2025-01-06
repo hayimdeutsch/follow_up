@@ -5,8 +5,8 @@ const sendFromTeacher = async (teacher, studentEmail, subject, content) => {
   try {
     await sendGmail(teacher, studentEmail, subject, content);
   } catch (error) {
-    sendFromSystem(studentEmail, subject, content);
-    // Need to adjust the content to indicate the teacher it was sent from
+    const newSubject = `Message from ${teacher.firstName} ${teacher.lastName}`;
+    sendFromSystem(studentEmail, newSubject, content);
     console.error("Failed to send email", error);
   }
 };
