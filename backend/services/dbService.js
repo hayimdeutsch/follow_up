@@ -374,8 +374,7 @@ const submitFollowUp = async (token) => {
   try {
     await FollowUp.findOneAndUpdate(
       { token },
-      { submitted: true, submittedAt: now() },
-      { new: true }
+      { submitted: true, submittedAt: now() }
     );
     const followUp = await getFollowUpByToken(token);
     return followUp;
