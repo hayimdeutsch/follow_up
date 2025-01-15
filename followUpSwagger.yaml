@@ -1,0 +1,2661 @@
+openapi: 3.0.0
+info:
+  title: Follow-Up API
+  description: API for managing students, follow-ups, and users.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api/v1
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://accounts.google.com/o/oauth2/auth
+          tokenUrl: https://oauth2.googleapis.com/token
+          scopes:
+            profile: Access to your basic profile info
+            email: Access to your email address
+            https://www.googleapis.com/auth/gmail.send: Send email on your behalf
+            https://www.googleapis.com/auth/calendar: Full access to your calendar
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      tags:
+        - Registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Doe
+                gmail:
+                  type: string
+                  example: john.doe@gmail.com
+                phone:
+                  type: string
+                  example: "+1234567890"
+      responses:
+        '201':
+          description: Application successfully submitted
+        '400':
+          description: All fields are required
+        '500':
+          description: Internal server error
+
+  /auth/check-approval:
+    post:
+      summary: Check user approval status (perliminary check before login with google)
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gmail:
+                  type: string
+                  example: john.doe@gmail.com
+      responses:
+        '200':
+          description: User is approved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User is approved
+        '400':
+          description: Gmail is required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Gmail is required
+        '401':
+          description: User not yet approved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not yet approved
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+          
+  /auth/google:
+    get:
+      summary: Initiate Google authentication
+      tags:
+        - Auth
+      parameters:
+        - name: returnTo
+          in: query
+          required: false
+          description: URL to redirect to after authentication
+          schema:
+            type: string
+            example: "http://localhost:3000/dashboard"
+      responses:
+        '302':
+          description: Redirect to Google authentication
+          headers:
+            Location:
+              description: URL to redirect the user to Google authentication
+              schema:
+                type: string
+
+  /auth/google/callback:
+    get:
+      summary: Google authentication callback
+      tags:
+        - Auth
+      responses:
+        '302':
+          description: Redirect after Google authentication to returnTo param
+
+  /auth/logout:
+    get:
+      summary: Logout the user
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logout successful
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+                    
+  /auth/user:
+    get:
+      summary: Get the authenticated user
+      tags:
+        - Auth
+      security:
+        - oauth2: []
+      responses:
+        '200':
+          description: Authenticated user details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60d0fe4f5311236168a109ca"
+                  firstName:
+                    type: string
+                    example: "John"
+                  lastName:
+                    type: string
+                    example: "Doe"
+                  email:
+                    type: string
+                    example: "john.doe@gmail.com"
+                  approved:
+                    type: boolean
+                    example: true
+                  phone:
+                    type: string
+                    example: "+1234567890"
+                  googleId:
+                    type: string
+                    example: "google-oauth2|1234567890"
+                  students:
+                    type: array
+                    items:
+                      type: string
+                      example: "60d0fe4f5311236168a109cb"
+                  googleTokens:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        example: "ya29.a0AfH6SMB..."
+                      refreshToken:
+                        type: string
+                        example: "1//0g..."
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Not authenticated
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+                    
+  /admin/check-admin:
+    post:
+      summary: Check if the user is an admin before login
+      tags:
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gmail:
+                  type: string
+                  example: admin@example.com
+      responses:
+        '200':
+          description: Admin approved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Admin approved
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Gmail is required
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /admin/users/pending:
+    get:
+      summary: Get pending users
+      tags:
+        - Admin
+      security:
+        - oauth2: []
+      responses:
+        '200':
+          description: List of pending users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: "60d0fe4f5311236168a109ca"
+                    firstName:
+                      type: string
+                      example: "John"
+                    lastName:
+                      type: string
+                      example: "Doe"
+                    email:
+                      type: string
+                      example: "john.doe@gmail.com"
+                    approved:
+                      type: boolean
+                      example: false
+                    phone:
+                      type: string
+                      example: "+1234567890"
+                    googleId:
+                      type: string
+                      example: "google-oauth2|1234567890"
+                    students:
+                      type: array
+                      items:
+                        type: string
+                        example: "60d0fe4f5311236168a109cb"
+                    googleTokens:
+                      type: object
+                      properties:
+                        accessToken:
+                          type: string
+                          example: "ya29.a0AfH6SMB..."
+                        refreshToken:
+                          type: string
+                          example: "1//0g..."
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /admin/users/approved:
+    get:
+      summary: Get approved users
+      tags:
+        - Admin
+      security:
+        - oauth2: []
+      responses:
+        '200':
+          description: List of approved users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: "60d0fe4f5311236168a109ca"
+                    firstName:
+                      type: string
+                      example: "John"
+                    lastName:
+                      type: string
+                      example: "Doe"
+                    email:
+                      type: string
+                      example: "john.doe@gmail.com"
+                    approved:
+                      type: boolean
+                      example: true
+                    phone:
+                      type: string
+                      example: "+1234567890"
+                    googleId:
+                      type: string
+                      example: "google-oauth2|1234567890"
+                    students:
+                      type: array
+                      items:
+                        type: string
+                        example: "60d0fe4f5311236168a109cb"
+                    googleTokens:
+                      type: object
+                      properties:
+                        accessToken:
+                          type: string
+                          example: "ya29.a0AfH6SMB..."
+                        refreshToken:
+                          type: string
+                          example: "1//0g..."
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+    post:
+      summary: Create an approved user
+      tags:
+        - Admin
+      security:
+        - oauth2: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  example: "John"
+                lastName:
+                  type: string
+                  example: "Doe"
+                gmail:
+                  type: string
+                  example: "john.doe@gmail.com"
+                phone:
+                  type: string
+                  example: "+1234567890"
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60d0fe4f5311236168a109ca"
+                  firstName:
+                    type: string
+                    example: "John"
+                  lastName:
+                    type: string
+                    example: "Doe"
+                  email:
+                    type: string
+                    example: "john.doe@gmail.com"
+                  approved:
+                    type: boolean
+                    example: true
+                  phone:
+                    type: string
+                    example: "+1234567890"
+                  students:
+                    type: array
+                    items:
+                      type: string
+                      example: "60d0fe4f5311236168a109cb"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bad request
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /admin/users/{userId}:
+    delete:
+      summary: Delete a user
+      tags:
+        - Admin
+      security:
+        - oauth2: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user to delete
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109ca"
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+                    
+  /admin/users/{userId}/approve:
+    post:
+      summary: Approve a user
+      tags:
+        - Admin
+      security:
+        - oauth2: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user to approve
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109ca"
+      responses:
+        '200':
+          description: User approved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User approved successfully
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bad request
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /students:
+    get:
+      summary: Get students by teacher
+      tags:
+        - Students
+      security:
+        - oauth2: []
+      responses:
+        '200':
+          description: List of students
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  students:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: "60d0fe4f5311236168a109ca"
+                        firstName:
+                          type: string
+                          example: "John"
+                        lastName:
+                          type: string
+                          example: "Doe"
+                        email:
+                          type: string
+                          example: "john.doe@gmail.com"
+                        eventDate:
+                          type: string
+                          format: date-time
+                          example: "2023-01-01T00:00:00.000Z"
+                        scheduledEmails:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              scheduledDate:
+                                type: string
+                                format: date-time
+                                example: "2023-01-01T00:00:00.000Z"
+                              status:
+                                type: string
+                                enum: ["pending", "sent", "cancelled"]
+                                example: "pending"
+                              retryCount:
+                                type: number
+                                example: 0
+                        followUps:
+                          type: array
+                          items:
+                            type: string
+                            example: "60d0fe4f5311236168a109cb"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+    post:
+      summary: Create a new student
+      tags:
+        - Students
+      security:
+        - oauth2: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  example: "John"
+                lastName:
+                  type: string
+                  example: "Doe"
+                email:
+                  type: string
+                  example: "john.doe@gmail.com"
+                eventDate:
+                  type: string
+                  format: date-time
+                  example: "2023-01-01T00:00:00.000Z"
+                scheduledEmails:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      scheduledDate:
+                        type: string
+                        format: date-time
+                        example: "2023-01-01T00:00:00.000Z"
+      responses:
+        '201':
+          description: Student created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60d0fe4f5311236168a109ca"
+                  firstName:
+                    type: string
+                    example: "John"
+                  lastName:
+                    type: string
+                    example: "Doe"
+                  email:
+                    type: string
+                    example: "john.doe@gmail.com"
+                  eventDate:
+                    type: string
+                    format: date-time
+                    example: "2023-01-01T00:00:00.000Z"
+                  scheduledEmails:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scheduledDate:
+                          type: string
+                          format: date-time
+                          example: "2023-01-01T00:00:00.000Z"
+                        status:
+                          type: string
+                          enum: ["pending", "sent", "cancelled"]
+                          example: "pending"
+                        sentAt:
+                          type: string
+                          format: date-time
+                          example: "2023-01-01T01:00:00.000Z"
+                        retryCount:
+                          type: number
+                          example: 0
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Missing required fields
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /students/{studentId}:
+    get:
+      summary: Get a specific student
+      tags:
+        - Students
+      security:
+        - oauth2: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          description: ID of the student to retrieve
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109ca"
+      responses:
+        '200':
+          description: Student details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60d0fe4f5311236168a109ca"
+                  firstName:
+                    type: string
+                    example: "John"
+                  lastName:
+                    type: string
+                    example: "Doe"
+                  email:
+                    type: string
+                    example: "john.doe@gmail.com"
+                  eventDate:
+                    type: string
+                    format: date-time
+                    example: "2023-01-01T00:00:00.000Z"
+                  teacher:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109ca"
+                      firstName:
+                        type: string
+                        example: "John"
+                      lastName:
+                        type: string
+                        example: "Doe"
+                      email:
+                        type: string
+                        example: "john.doe@gmail.com"
+                      approved:
+                        type: boolean
+                        example: true
+                      phone:
+                        type: string
+                        example: "+1234567890"
+                      googleId:
+                        type: string
+                        example: "google-oauth2|1234567890"
+                      students:
+                        type: array
+                        items:
+                          type: string
+                          example: "60d0fe4f5311236168a109cb"
+                      googleTokens:
+                        type: object
+                        properties:
+                          accessToken:
+                            type: string
+                            example: "ya29.a0AfH6SMB..."
+                          refreshToken:
+                            type: string
+                            example: "1//0g..."
+                  followUps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: "60d0fe4f5311236168a109cb"
+                        token:
+                          type: string
+                          example: "abc123token"
+                        title:
+                          type: string
+                          example: "Follow-up Title"
+                        student:
+                          type: string
+                          example: "60d0fe4f5311236168a109ca"
+                        teacher:
+                          type: string
+                          example: "60d0fe4f5311236168a109cc"
+                        questionnaire:
+                          type: string
+                          example: "60d0fe4f5311236168a109cd"
+                        meeting:
+                          type: string
+                          example: "60d0fe4f5311236168a109ce"
+                        submitted:
+                          type: boolean
+                          example: false
+                  scheduledEmails:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scheduledDate:
+                          type: string
+                          format: date-time
+                          example: "2023-01-01T00:00:00.000Z"
+                        status:
+                          type: string
+                          enum: ["pending", "sent", "cancelled"]
+                          example: "true"
+                        sentAt:
+                          type: string
+                          format: date-time
+                          example: "2023-01-01T01:00:00.000Z"
+                        retryCount:
+                          type: number
+                          example: 1
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '404':
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Student not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+    delete:
+      summary: Delete a specific student
+      tags:
+        - Students
+      security:
+        - oauth2: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          description: ID of the student to delete
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109ca"
+      responses:
+        '204':
+          description: Student deleted successfully
+        '404':
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Student not found
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+                    
+  /students/{studentId}/emails:
+    put:
+      summary: Update student emails
+      tags:
+        - Students
+      security:
+        - oauth2: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          description: ID of the student to update
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109ca"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scheduledEmails:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scheduledDate:
+                          type: string
+                          format: date-time
+                          example: "2023-01-01T00:00:00.000Z"
+                        status:
+                          type: string
+                          enum: ["pending", "sent", "cancelled"]
+                          example: "sent"
+                        sentAt:
+                          type: string
+                          format: date-time
+                          example: "2023-01-01T01:00:00.000Z"
+                        retryCount:
+                          type: number
+                          example: 1
+      responses:
+        '200':
+          description: Student emails updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60d0fe4f5311236168a109ca"
+                  firstName:
+                    type: string
+                    example: "John"
+                  lastName:
+                    type: string
+                    example: "Doe"
+                  email:
+                    type: string
+                    example: "john.doe@gmail.com"
+                  eventDate:
+                    type: string
+                    format: date-time
+                    example: "2023-01-01T00:00:00.000Z"
+                  followUps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: "60d0fe4f5311236168a109cb"
+                        token:
+                          type: string
+                          example: "abc123token"
+                        title:
+                          type: string
+                          example: "Follow-up Title"
+                        student:
+                          type: string
+                          example: "60d0fe4f5311236168a109ca"
+                        teacher:
+                          type: string
+                          example: "60d0fe4f5311236168a109cc"
+                        questionnaire:
+                          type: string
+                          example: "60d0fe4f5311236168a109cd"
+                        meeting:
+                          type: string
+                          example: "60d0fe4f5311236168a109ce"
+                        submitted:
+                          type: boolean
+                          example: false
+                  scheduledEmails:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scheduledDate:
+                          type: string
+                          format: date-time
+                          example: "2023-01-01T00:00:00.000Z"
+                        status:
+                          type: string
+                          enum: ["pending", "sent", "cancelled"]
+                          example: "sent"
+                        sentAt:
+                          type: string
+                          format: date-time
+                          example: "2023-01-01T01:00:00.000Z"
+                        retryCount:
+                          type: number
+                          example: 1
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bad request
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '404':
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Student not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /students/{studentId}/followups:
+    get:
+      summary: Get follow-ups for a student
+      tags:
+        - FollowUps
+      security:
+        - oauth2: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          description: ID of the student to retrieve follow-ups for
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109ca"
+      responses:
+        '200':
+          description: List of follow-ups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: "60d0fe4f5311236168a109cb"
+                    token:
+                      type: string
+                      example: "abc123token"
+                    title:
+                      type: string
+                      example: "Follow-up Title"
+                    student:
+                      type: string
+                      example: "60d0fe4f5311236168a109ca"
+                    teacher:
+                      type: string
+                      example: "60d0fe4f5311236168a109cc"
+                    questionnaire:
+                      type: string
+                      example: "60d0fe4f5311236168a109cd"
+                    meeting:
+                      type: string
+                      example: "60d0fe4f5311236168a109ce"
+                    submitted:
+                      type: boolean
+                      example: true
+                    submittedAt:
+                      type: string
+                      format: date-time
+                      example: "2023-01-01T00:00:00.000Z"
+        '404':
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Student not found
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+    post:
+      summary: Create a follow-up for a student
+      tags:
+        - FollowUps
+      security:
+        - oauth2: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          description: ID of the student to create a follow-up for
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109ca"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Follow-up 1"
+                options:
+                  type: object
+                  properties:
+                    isQuestionnaire:
+                      type: boolean
+                      example: true
+                    isMeeting:
+                      type: boolean
+                      example: false
+                emailText:
+                  type: string
+                  example: "Please complete the following questionnaire."
+                questionnaire:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      example: "Questionnaire 1"
+                    questions:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          question:
+                            type: string
+                            example: "How are you?"
+                          hasRange:
+                            type: boolean
+                            example: true
+                          hasSentence:
+                            type: boolean
+                            example: false
+                          sentenceAnswer:
+                            type: string
+                            example: "I am fine."
+                meeting:
+                  type: object
+                  properties:
+                    timeSlots:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          startTime:
+                            type: string
+                            format: date-time
+                            example: "2023-01-01T10:00:00.000Z"
+                          endTime:
+                            type: string
+                            format: date-time
+                            example: "2023-01-01T11:00:00.000Z"
+                    duration:
+                      type: integer
+                      example: 60
+      responses:
+        '201':
+          description: Follow-up created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60d0fe4f5311236168a109cb"
+                  token:
+                    type: string
+                    example: "abc123token"
+                  title:
+                    type: string
+                    example: "Follow-up Title"
+                  student:
+                    type: string
+                    example: "60d0fe4f5311236168a109ca"
+                  teacher:
+                    type: string
+                    example: "60d0fe4f5311236168a109cc"
+                  questionnaire:
+                    type: string
+                    example: "60d0fe4f5311236168a109cd"
+                  meeting:
+                    type: string
+                    example: "60d0fe4f5311236168a109ce"
+                  submitted:
+                    type: boolean
+                    example: false
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bad request
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '404':
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Student not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /students/{studentId}/followups/{followupId}:
+    get:
+      summary: Get a specific follow-up
+      tags:
+        - FollowUps
+      security:
+        - oauth2: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          description: ID of the student
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109ca"
+        - name: followupId
+          in: path
+          required: true
+          description: ID of the follow-up
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109cb"
+      responses:
+        '200':
+          description: Follow-up details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60d0fe4f5311236168a109cb"
+                  token:
+                    type: string
+                    example: "abc123token"
+                  title:
+                    type: string
+                    example: "Follow-up Title"
+                  student:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109ca"
+                      firstName:
+                        type: string
+                        example: "John"
+                      lastName:
+                        type: string
+                        example: "Doe"
+                      email:
+                        type: string
+                        example: "john.doe@gmail.com"
+                  teacher:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109cc"
+                      firstName:
+                        type: string
+                        example: "Jane"
+                      lastName:
+                        type: string
+                        example: "Smith"
+                      email:
+                        type: string
+                        example: "jane.smith@gmail.com"
+                      phone:
+                        type: string
+                        example: "123-456-7890"
+                      googleId:
+                        type: string
+                        example: "google123"
+                  questionnaire:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109cd"
+                      title:
+                        type: string
+                        example: "Questionnaire Title"
+                      questions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            question:
+                              type: string
+                              example: "What is your name?"
+                            hasRange:
+                              type: boolean
+                              example: false
+                            hasSentence:
+                              type: boolean
+                              example: true
+                            sentenceAnswer:
+                              type: string
+                              example: "My name is John."
+                  meeting:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109ce"
+                      topic:
+                        type: string
+                        example: "Meeting Title"
+                      timeSlots:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            startTime:
+                              type: string
+                              format: date-time
+                              example: "2023-01-01T10:00:00.000Z"
+                            endTime:
+                              type: string
+                              format: date-time
+                              example: "2023-01-01T11:00:00.000Z"
+                      selectedTimeSlot:
+                        type: object
+                        properties:
+                          startTime:
+                            type: string
+                            format: date-time
+                            example: "2023-01-01T10:00:00.000Z"
+                          endTime:
+                            type: string
+                            format: date-time
+                            example: "2023-01-01T11:00:00.000Z"
+                      duration:
+                        type: integer
+                        example: 60
+                      googleEventId:
+                        type: string
+                        example: "event123"
+                      status:
+                        type: string
+                        enum: ["awaiting_selection", "confirmed", "completed", "canceled"]
+                        example: "awaiting_selection"
+                  submitted:
+                    type: boolean
+                    example: true
+                  submittedAt:
+                    type: string
+                    format: date-time
+                    example: "2023-01-01T00:00:00.000Z"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '404':
+          description: Follow-up not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Follow-up not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+    put:
+      summary: Update a specific follow-up
+      tags:
+        - FollowUps
+      security:
+        - oauth2: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          description: ID of the student
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109ca"
+        - name: followupId
+          in: path
+          required: true
+          description: ID of the follow-up
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109cb"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                questionnaire:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109cd"
+                      title:
+                        type: string
+                        example: "Questionnaire Title"
+                      questions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            question:
+                              type: string
+                              example: "What is your name?"
+                            hasRange:
+                              type: boolean
+                              example: false
+                            hasSentence:
+                              type: boolean
+                              example: true
+                            sentenceAnswer:
+                              type: string
+                              example: "My name is John."
+                meeting:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: "60d0fe4f5311236168a109ce"
+                    topic:
+                      type: string
+                      example: "Meeting Title"
+                    timeSlots:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          startTime:
+                            type: string
+                            format: date-time
+                            example: "2023-01-01T10:00:00.000Z"
+                          endTime:
+                            type: string
+                            format: date-time
+                            example: "2023-01-01T11:00:00.000Z"
+                    duration:
+                      type: integer
+                      example: 60
+                    status:
+                      type: string
+                      enum: ["awaiting_selection", "confirmed", "completed", "canceled"]
+                      example: "awaiting_selection"
+      responses:
+        '200':
+          description: Follow-up updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60d0fe4f5311236168a109cb"
+                  token:
+                    type: string
+                    example: "abc123token"
+                  title:
+                    type: string
+                    example: "Follow-up Title"
+                  student:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109ca"
+                      firstName:
+                        type: string
+                        example: "John"
+                      lastName:
+                        type: string
+                        example: "Doe"
+                      email:
+                        type: string
+                        example: "john.doe@gmail.com"
+                  teacher:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109cc"
+                      firstName:
+                        type: string
+                        example: "Jane"
+                      lastName:
+                        type: string
+                        example: "Smith"
+                      email:
+                        type: string
+                        example: "jane.smith@gmail.com"
+                      phone:
+                        type: string
+                        example: "123-456-7890"
+                      googleId:
+                        type: string
+                        example: "google123"
+                  questionnaire:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109cd"
+                      title:
+                        type: string
+                        example: "Questionnaire Title"
+                      questions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            question:
+                              type: string
+                              example: "What is your name?"
+                            hasRange:
+                              type: boolean
+                              example: false
+                            hasSentence:
+                              type: boolean
+                              example: true
+                            sentenceAnswer:
+                              type: string
+                              example: "My name is John."
+                  meeting:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109ce"
+                      topic:
+                        type: string
+                        example: "Meeting Title"
+                      timeSlots:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            startTime:
+                              type: string
+                              format: date-time
+                              example: "2023-01-01T10:00:00.000Z"
+                            endTime:
+                              type: string
+                              format: date-time
+                              example: "2023-01-01T11:00:00.000Z"
+                      selectedTimeSlot:
+                        type: object
+                        properties:
+                          startTime:
+                            type: string
+                            format: date-time
+                            example: "2023-01-01T10:00:00.000Z"
+                          endTime:
+                            type: string
+                            format: date-time
+                            example: "2023-01-01T11:00:00.000Z"
+                      duration:
+                        type: integer
+                        example: 60
+                      googleEventId:
+                        type: string
+                        example: "event123"
+                      status:
+                        type: string
+                        enum: ["awaiting_selection", "confirmed", "completed", "canceled"]
+                        example: "awaiting_selection"
+                  submitted:
+                    type: boolean
+                    example: true
+                  submittedAt:
+                    type: string
+                    format: date-time
+                    example: "2023-01-01T00:00:00.000Z"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bad request
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: FollowUp already submitted
+        '404':
+          description: Follow-up not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Follow-up not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+    delete:
+      summary: Delete a specific follow-up
+      tags:
+        - FollowUps
+      security:
+        - oauth2: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          description: ID of the student
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109ca"
+        - name: followupId
+          in: path
+          required: true
+          description: ID of the follow-up
+          schema:
+            type: string
+            example: "60d0fe4f5311236168a109cb"
+      responses:
+        '204':
+          description: Follow-up deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '404':
+          description: Follow-up not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Follow-up not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+                    
+  /students/followups/{token}:
+    get:
+      summary: Get a follow-up by token
+      tags:
+        - FollowUps
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: Token to retrieve the follow-up
+          schema:
+            type: string
+            example: "abc123token"
+      responses:
+        '200':
+          description: Follow-up details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "abc123token"
+                  title:
+                    type: string
+                    example: "Follow-up Title"
+                  student:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109ca"
+                      firstName:
+                        type: string
+                        example: "John"
+                      lastName:
+                        type: string
+                        example: "Doe"
+                      email:
+                        type: string
+                        example: "john.doe@gmail.com"
+                  questionnaire:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109cd"
+                      title:
+                        type: string
+                        example: "Questionnaire Title"
+                      questions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            question:
+                              type: string
+                              example: "How would you rate your experience?"
+                            hasRange:
+                              type: boolean
+                              example: true
+                            hasSentence:
+                              type: boolean
+                              example: true
+                            range:
+                              type: object
+                              properties:
+                                min:
+                                  type: number
+                                  example: 1
+                                max:
+                                  type: number
+                                  example: 10
+                  meeting:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "60d0fe4f5311236168a109ce"
+                      topic:
+                        type: string
+                        example: "Meeting Title"
+                      timeSlots:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            startTime:
+                              type: string
+                              format: date-time
+                              example: "2023-01-01T10:00:00.000Z"
+                            endTime:
+                              type: string
+                              format: date-time
+                              example: "2023-01-01T11:00:00.000Z"
+                      duration:
+                        type: integer
+                        example: 60
+                      status:
+                        type: string
+                        enum: ["awaiting_selection", "confirmed", "completed", "canceled"]
+                        example: "awaiting_selection"
+        '404':
+          description: Follow-up not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Follow-up not found
+        '409':
+          description: Follow-up already submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Follow-up already submitted
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+                    
+  /students/followups/{token}/submit:
+    post:
+      summary: Submit a follow-up by token
+      tags:
+        - FollowUps
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: Token to submit the follow-up
+          schema:
+            type: string
+            example: "abc123token"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                questions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      question:
+                        type: string
+                        example: "What is your name?"
+                      hasRange:
+                        type: boolean
+                        example: true
+                      hasSentence:
+                        type: boolean
+                        example: true
+                      range:
+                        type: object
+                        properties:
+                          min:
+                            type: number
+                            example: 1
+                          max:
+                            type: number
+                            example: 10
+                          studentAnswer:
+                            type: number
+                            example: 7
+                      sentenceAnswer:
+                        type: string
+                        example: "My name is John."
+                selectedTimeSlot:
+                  type: object
+                  properties:
+                    startTime:
+                      type: string
+                      format: date-time
+                      example: "2023-01-01T10:00:00.000Z"
+                    endTime:
+                      type: string
+                      format: date-time
+                      example: "2023-01-01T11:00:00.000Z"
+      responses:
+        '200':
+          description: Follow-up submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Follow-up submitted successfully
+        '400':
+          description: Missing necessary fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Missing necessary fields
+        '404':
+          description: Follow-up not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Follow-up not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /templates:
+    get:
+      summary: Get all templates
+      tags:
+        - Templates
+      security:
+        - oauth2: []
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: "60d0fe4f5311236168a109ca"
+                    title:
+                      type: string
+                      example: "Template Title"
+                    description:
+                      type: string
+                      example: "Form to be sent after two months"
+                    questions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            question:
+                              type: string
+                              example: "How would you rate your experience?"
+                            hasRange:
+                              type: boolean
+                              example: true
+                            hasSentence:
+                              type: boolean
+                              example: true
+                            range:
+                              type: object
+                              properties:
+                                min:
+                                  type: number
+                                  example: 1
+                                max:
+                                  type: number
+                                  example: 10
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+    post:
+      summary: Create a new template
+      tags:
+        - Templates
+      security:
+        - oauth2: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "New Template Title"
+                description:
+                  type: string
+                  example: "Form to be sent after two months"
+                questions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      question:
+                        type: string
+                        example: "How would you rate your experience?"
+                      hasRange:
+                        type: boolean
+                        example: true
+                      hasSentence:
+                        type: boolean
+                        example: true
+                      range:
+                        type: object
+                        properties:
+                          min:
+                            type: number
+                            example: 1
+                          max:
+                            type: number
+                            example: 10
+      responses:
+        '201':
+          description: Template created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Template created successfully
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bad request
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /templates/{title}:
+    get:
+      summary: Get questions for a specific template
+      tags:
+        - Templates
+      security:
+        - oauth2: []
+      parameters:
+        - name: title
+          in: path
+          required: true
+          description: Title of the template
+          schema:
+            type: string
+            example: "Template&Title"
+      responses:
+        '200':
+          description: Template questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    question:
+                      type: string
+                      example: "How would you rate your experience?"
+                    hasRange:
+                      type: boolean
+                      example: true
+                    hasSentence:
+                      type: boolean
+                      example: true
+                    range:
+                      type: object
+                      properties:
+                        min:
+                          type: number
+                          example: 1
+                        max:
+                          type: number
+                          example: 10
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '404':
+          description: Template not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Template not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+    put:
+      summary: Update a specific template
+      tags:
+        - Templates
+      security:
+        - oauth2: []
+      parameters:
+        - name: title
+          in: path
+          required: true
+          description: Title of the template
+          schema:
+            type: string
+            example: "Template Title"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: "Form to be sent after two months"
+                questions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question:
+                          type: string
+                          example: "How would you rate your experience?"
+                        hasRange:
+                          type: boolean
+                          example: true
+                        hasSentence:
+                          type: boolean
+                          example: true
+                        range:
+                          type: object
+                          properties:
+                            min:
+                              type: number
+                              example: 1
+                            max:
+                              type: number
+                              example: 10
+      responses:
+        '200':
+          description: Template updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60d0fe4f5311236168a109ca"
+                  title:
+                    type: string
+                    example: "Template Title"
+                  description:
+                    type: string
+                    example: "Form to be sent after two months"
+                  questions:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          question:
+                            type: string
+                            example: "How would you rate your experience?"
+                          hasRange:
+                            type: boolean
+                            example: true
+                          hasSentence:
+                            type: boolean
+                            example: true
+                          range:
+                            type: object
+                            properties:
+                              min:
+                                type: number
+                                example: 1
+                              max:
+                                type: number
+                                example: 10
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bad request
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
+        '404':
+          description: Template not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Template not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+    delete:
+      summary: Delete a specific template
+      tags:
+        - Templates
+      security:
+        - oauth2: []
+      parameters:
+        - name: title
+          in: path
+          required: true
+          description: Title of the template
+          schema:
+            type: string
+            example: "Template Title"
+      responses:
+        '204':
+          description: Template deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Template deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
+        '404':
+          description: Template not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Template not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
