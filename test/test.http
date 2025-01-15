@@ -56,7 +56,6 @@ Content-Type: application/json
 ###
 ### Check Approval of Unapproved User
 POST http://localhost:3000/api/v1/auth/check-approval
-
 Content-Type: application/json
 
 {

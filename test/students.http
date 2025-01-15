@@ -74,9 +74,12 @@ Content-Type: application/json
 GET http://localhost:3000/api/v1/students
 
 ###
-### Get Student By ID First
+### Get First Student By ID
 GET http://localhost:3000/api/v1/students/67842793264a4985c1613ef7
 
+###
+### Get Hayim Student By ID
+GET http://localhost:3000/api/v1/students/6784e330acea40c0da7a9f94
 ###
 ### Update Student First
 PUT http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/emails
@@ -105,11 +108,16 @@ DELETE http://localhost:3000/api/v1/students/6784278f264a4985c1613eef
 ###
 
 ### Follow-Up Requests ###
-### Get Follow-Ups
+### Get First Student Follow-Ups
 GET http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups
 
-### Create a Follow-Up Request
-POST http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups
+###
+### Get Hayim Student Follow-Ups
+GET http://localhost:3000/api/v1/students/6784e330acea40c0da7a9f94/followups
+
+###
+### Create a Follow-Up for Hayim Student
+POST http://localhost:3000/api/v1/students/6784e330acea40c0da7a9f94/followups
 Content-Type: application/json
 
 {
@@ -189,11 +197,11 @@ Content-Type: application/json
 ###
 
 ### Get Follow-Up By ID
-GET http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups/6784d822716afe062b76ae90
+GET http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups/6784ea67586264087efae31b
 
 ###
-### Update Follow-Up By ID
-PUT http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups/6784d822716afe062b76ae90
+### Update Hayim Student's Follow-Up By ID
+PUT http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups/6784ea67586264087efae31b
 Content-Type: application/json
 
 {
@@ -231,3 +239,64 @@ Content-Type: application/json
     ]
   }
 }
+
+###
+### Update Hayim Student's Follow-Up just meeting
+PUT http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups/6784ea67586264087efae31b
+Content-Type: application/json
+
+{
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      }
+    ]
+  }
+}
+
+###
+### Update Hayim Student's Follow-Up just questionnaire
+PUT http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups/6784ea67586264087efae31b
+Content-Type: application/json
+
+{
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      },
+      {
+        "question": "What is your age?",
+        "hasRange": true,
+        "hasSentence": false
+      },
+      {
+        "question": "What is your favorite color?",
+        "hasRange": false,
+        "hasSentence": true
+      },
+      {
+        "question": "What is your favorite food?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+
+###
+### Delete Hayim Student's Follow-Up By ID
+DELETE http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups/6784e4e4a2b88a2872ee0e95
+
+###
+### Get Hayim Student's Follow-Up By Token
+GET http://localhost:3000/api/v1/students/followups/d705dc07257f78ab
+
+###

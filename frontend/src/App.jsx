@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import PageNotFound from "./pages/PageNotFound";
 import FollowUpPage from "./pages/FollowUpPage";
 import StudentFollowUpPage from "./pages/StudentFollowUpPage";
+import TeacherFollowUpView from "./pages/TeacherFollowUpView";
 
 const App = () => {
   return (
