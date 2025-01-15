@@ -8,12 +8,14 @@ const scheduleCalendarEvent = async (
   teacher,
   studentName,
   studentEmail,
+  topic,
   selectedTimeSlot
 ) => {
   const event = initEventObject(
     teacher.email,
     studentName,
     studentEmail,
+    topic,
     selectedTimeSlot
   );
   try {
@@ -28,10 +30,12 @@ const initEventObject = (
   teacherEmail,
   studentName,
   studentEmail,
+  topic,
   selectedTimeSlot
 ) => {
   const eventObj = {
     location: "online",
+    summary: topic,
     description: `Followup meeting with ${studentName}`,
     start: {
       dateTime: selectedTimeSlot.startTime,
@@ -57,4 +61,4 @@ const initEventObject = (
   return eventObj;
 };
 
-export { scheduleEvent };
+export { scheduleCalendarEvent };

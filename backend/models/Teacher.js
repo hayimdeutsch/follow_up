@@ -8,13 +8,21 @@ const TeacherSchema = new Schema({
   email: { type: String, required: true, unique: true },
   approved: { type: Boolean, default: false },
   phone: String,
-  googleId: { type: String, unique: true },
+  googleId: { type: String },
   students: [{ type: Schema.Types.ObjectId, ref: "Student" }],
   googleTokens: {
     accessToken: String,
     refreshToken: String,
   },
 });
+
+TeacherSchema.index(
+  { googleId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { googleId: { $exists: true, $ne: null } },
+  }
+);
 
 const Teacher = mongoose.model("Teacher", TeacherSchema);
 

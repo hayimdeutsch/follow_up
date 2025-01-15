@@ -12,7 +12,7 @@ const createTemplate = async (req, res, next) => {
       description,
       questions
     );
-    res.status(201).json(templateQuestionnaire);
+    res.status(201).json({ message: "Template created successfully" });
   } catch (error) {
     next(error);
   }
@@ -21,7 +21,7 @@ const createTemplate = async (req, res, next) => {
 const getTemplates = async (req, res, next) => {
   try {
     const templates = await dbService.getAllTemplates();
-    res.status(200).json({ templates });
+    res.status(200).json(templates);
   } catch (error) {
     next(error);
   }
@@ -29,9 +29,12 @@ const getTemplates = async (req, res, next) => {
 
 const getTemplateQuestions = async (req, res, next) => {
   try {
-    const { id: title } = req.params;
+    const { title } = req.params;
     const template = await dbService.getTemplateByTitle(title);
-    res.status(200).json({ questions: template.questions });
+    if (!template) {
+      throw new CustomError("Template not found", 404);
+    }
+    res.status(200).json(template.questions);
   } catch (error) {
     next(error);
   }
@@ -39,13 +42,18 @@ const getTemplateQuestions = async (req, res, next) => {
 
 const updateTemplate = async (req, res, next) => {
   try {
-    const { id: title } = req.params;
-    const { questions } = req.body;
-    if (!questions) {
+    const { title } = req.params;
+    const { questions, description } = req.body;
+    if (!questions || !description) {
       throw new CustomError("Missing required fields", 400);
     }
-    await dbService.updateTemplateByTitle(title, questions);
-    res.status(200).json({ message: "Template updated successfully" });
+
+    const updatedTemplate = await dbService.updateTemplateByTitle(title, {
+      questions,
+      description,
+    });
+
+    res.status(200).json(updatedTemplate);
   } catch (error) {
     next(error);
   }
@@ -53,9 +61,9 @@ const updateTemplate = async (req, res, next) => {
 
 const deleteTemplate = async (req, res, next) => {
   try {
-    const { id: title } = req.params;
+    const { title } = req.params;
     await dbService.deleteTemplateByTitle(title);
-    res.status(200).json({ message: "Template deleted successfully" });
+    res.status(204).json({ message: "Template deleted successfully" });
   } catch (error) {
     next(error);
   }

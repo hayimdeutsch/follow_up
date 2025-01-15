@@ -5,12 +5,7 @@ import MongoStore from "connect-mongo";
 import cors from "cors";
 import passport from "./config/passportConfig.js";
 
-import authRouter from "./routes/authRoutes.js";
-import adminRouter from "./routes/adminRoutes.js";
-import registrationRouter from "./routes/registrationRoutes.js";
-import teacherRouter from "./routes/teacherRoutes.js";
-import templateRouter from "./routes/templateRoutes.js";
-import questionnaireRouter from "./routes/questionnaireRoutes.js";
+import mainRouter from "./routes/mainRouter.js";
 import errorHandler from "./middleware/errorHandler.js";
 import connectDB from "./config/dbConfig.js";
 
@@ -39,12 +34,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/auth", authRouter);
-app.use("/admin", adminRouter);
-app.use("/register", registrationRouter);
-app.use("/teachers", teacherRouter);
-app.use("/templates", templateRouter);
-app.use("/questionnaires", questionnaireRouter);
+app.use("/api/v1", mainRouter);
 
 app.use(errorHandler);
 

@@ -1,0 +1,37 @@
+### Check Admin Core
+POST http://localhost:3000/api/v1/admin/check-admin
+Content-Type: application/json
+
+{
+  "gmail": "core.torah.followup@gmail.com"
+}
+
+###
+### Check Admin Hayim
+POST http://localhost:3000/api/v1/admin/check-admin
+Content-Type: application/json
+
+{
+  "gmail": "chayimdeutsch@gmail.com"
+}
+
+###
+### Get Pending Users
+GET http://localhost:3000/api/v1/admin/users/pending
+
+###
+### Get Approved Users
+GET http://localhost:3000/api/v1/admin/users/approved
+
+###
+### Approve User - chayimdeutsch@gmail.com
+POST http://localhost:3000/api/v1/admin/users/chayimdeutsch@gmail.com/approve
+
+###
+### Approve User - unapprovedUser2@gmail
+POST http://localhost:3000/api/v1/admin/users/unapprovedUser2@gmail/approve
+
+###
+
+### Delete User - First User
+DELETE http://localhost:3000/api/v1/admin/users/unapprovedUser1@gmail.com

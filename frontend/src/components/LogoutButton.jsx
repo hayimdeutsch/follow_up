@@ -10,7 +10,7 @@ const LogoutButton = () => {
         credentials: "include",
       });
       if (response.ok) {
-        navigate("/");
+        navigate("/", { replace: true });
       } else {
         console.error("Logout failed");
       }

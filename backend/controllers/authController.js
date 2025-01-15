@@ -68,11 +68,7 @@ const logout = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    res.json(req.user);
-  } else {
-    next(new CustomError("Not authenticated", 401));
-  }
+  res.status(200).json(req.user);
 };
 
 export {

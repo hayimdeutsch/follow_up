@@ -38,23 +38,11 @@ const TeacherDashboard = ({ user }) => {
       {error && <div>{error}</div>}
       <ul>
         {students.map((student) => {
-          const {
-            _id: studentId,
-            firstName,
-            lastName,
-            email,
-            eventdate,
-            followupEmails,
-          } = student;
+          const { _id: studentId, firstName, lastName, email } = student;
           return (
             <li key={studentId}>
               <Link to={`/students/${studentId}`}>
-                {firstName} {lastName} {email}{" "}
-                {new Date(eventdate).toDateString()}
-                {followupEmails[0] &&
-                  ` - ${new Date(
-                    followupEmails[0].scheduledDate
-                  ).toDateString()}`}
+                {firstName} {lastName} {email}
               </Link>
             </li>
           );

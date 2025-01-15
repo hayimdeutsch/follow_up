@@ -1,13 +1,19 @@
 import { sendEmail as sendGmail } from "./googleService.js";
 import { systemTransporter } from "../config/emailConfig.js";
+import CustomError from "../utils/CustomError.js";
 
-const sendFromTeacher = async (teacher, studentEmail, subject, content) => {
+const sendFromTeacher = async (teacherObj, studentEmail, subject, content) => {
   try {
-    await sendGmail(teacher, studentEmail, subject, content);
+    await sendGmail(teacherObj, studentEmail, subject, content);
   } catch (error) {
-    const newSubject = `Message from ${teacher.firstName} ${teacher.lastName}`;
-    sendFromSystem(studentEmail, newSubject, content);
     console.error("Failed to send email", error);
+    try {
+      const newSubject = `Message from ${teacherObj.firstName} ${teacherObj.lastName}`;
+      await sendFromSystem(studentEmail, newSubject, content);
+    } catch (error) {
+      console.error("Failed to send email", error);
+      throw new CustomError("Failed to send email", 500);
+    }
   }
 };
 

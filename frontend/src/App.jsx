@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import StudentPage from "./pages/StudentPage";
-import LoginPage from "./components/LoginPage";
+import LoginPage from "./pages/LoginPage";
 import PageNotFound from "./pages/PageNotFound";
 import FollowUpPage from "./pages/FollowUpPage";
 import StudentFollowUpPage from "./pages/StudentFollowUpPage";
@@ -19,6 +19,10 @@ const App = () => {
         />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/followup/:token" element={<StudentFollowUpPage />} />
+        <Route
+          path="/teacher/followup/:token"
+          element={<StudentFollowUpPage />}
+        />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Router>

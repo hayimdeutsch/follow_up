@@ -6,10 +6,10 @@ const StudentSchema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
-  eventdate: { type: Date, required: true },
+  eventDate: { type: Date, required: true },
   teacher: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
-  followUp: { type: Schema.Types.ObjectId, ref: "FollowUp" },
-  followUpEmails: [
+  followUps: [{ type: Schema.Types.ObjectId, ref: "FollowUp" }],
+  scheduledEmails: [
     {
       scheduledDate: Date,
       status: {
@@ -24,8 +24,8 @@ const StudentSchema = new Schema({
 });
 
 StudentSchema.index({
-  "followupEmails.scheduledDate": 1,
-  "followupEmails.status": 1,
+  "scheduledEmails.scheduledDate": 1,
+  "scheduledEmails.status": 1,
 });
 
 const Student = mongoose.model("Student", StudentSchema);

@@ -1,6 +1,6 @@
 const mockAuthenticated = (req, res, next) => {
   req.user = {
-    _id: "676c4801dcf4b42fcbcaba97",
+    _id: "6770fcdb70be6909c4932583",
     email: "chayimdeutsch@gmail.com",
     googleId: "113882388930598865430",
   };

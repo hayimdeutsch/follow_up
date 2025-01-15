@@ -1,0 +1,159 @@
+### Create a Follow-Up Request
+POST http://localhost:3000/followups/6770fcdb70be6909c4932583
+Content-Type: application/json
+
+{
+  "token": "1234567",
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      }
+    ]
+  },
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+
+###
+### Follow-Up Request with only Questionnaire
+POST http://localhost:3000/followups/6770fcdb70be6909c4932583
+Content-Type: application/json
+
+{
+  "token": "7654321",
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+###
+### Follow-Up Request with only Meeting
+POST http://localhost:3000/followups/6770fcdb70be6909c4932583
+Content-Type: application/json
+
+{
+  "token": "987654321",
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      }
+    ]
+  } 
+}
+###
+### Get Follow-Up with both Meeting and Questionnaire
+GET http://localhost:3000/followups/1234567
+
+###
+### Get Follow-Up with only Questionnaire
+GET http://localhost:3000/followups/7654321
+###
+### Get Follow-Up with only Meeting
+GET http://localhost:3000/followups/987654321
+###
+### Get Follow-Up with invalid token
+GET http://localhost:3000/followups/invalidtoken
+###
+### Submit Follow-Up with both Meeting and Questionnaire
+PUT http://localhost:3000/followups/1234567
+Content-Type: application/json
+
+{
+  "subject": "Follow-Up Meeting",
+  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire and select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "selectedTimeSlot": {
+    "startTime": "2023-10-01T10:00:00Z",
+    "endTime": "2023-10-01T11:00:00Z"
+  },
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": true,
+      "studentAnswer": "John Doe"
+    }
+  ]
+}
+###
+### Submit Follow-Up with only Questionnaire
+PUT http://localhost:3000/followups/7654321
+Content-Type: application/json
+
+{
+  "subject": "Follow-Up Meeting",
+  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire. <a href='http://localhost:5173/followup/7654321' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": true,
+      "studentAnswer": "John Doe"
+    }
+  ]
+}
+###
+### Submit Follow-Up with only Meeting
+PUT http://localhost:3000/followups/987654321
+Content-Type: application/json
+
+{
+  "subject": "Follow-Up Meeting",
+  "emailText": "<html><body>Thank you for your time. Please select a time slot for our meeting. <a href='http://localhost:5173/followup/987654321' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "selectedTimeSlot": {
+    "startTime": "2023-10-01T10:00:00Z",
+    "endTime": "2023-10-01T11:00:00Z"
+  }
+}
+###
+### Submit Follow-Up with invalid token
+PUT http://localhost:3000/followups/invalidtoken
+Content-Type: application/json
+
+{
+  "subject": "Follow-Up Meeting",
+  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire and select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "selectedTimeSlot": {
+    "startTime": "2023-10-01T10:00:00Z",
+    "endTime": "2023-10-01T11:00:00Z"
+  },
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": true,
+      "studentAnswer": "John Doe"
+    }
+  ]
+}
+###
+###

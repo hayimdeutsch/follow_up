@@ -28,6 +28,7 @@ Content-Type: application/json
   ]
 }
 
+###
 ### template with different title - should succeed on first attempt, fail on second attempt
 POST http://localhost:3000/templates
 Content-Type: application/json
@@ -44,6 +45,7 @@ Content-Type: application/json
   ]
 }
 
+###
 ### template with no valid question type - should fail
 POST http://localhost:3000/templates
 Content-Type: application/json
@@ -60,6 +62,7 @@ Content-Type: application/json
   ]
 }
 
+###
 ### template with no questions - should fail
 POST http://localhost:3000/templates
 Content-Type: application/json
@@ -69,6 +72,7 @@ Content-Type: application/json
   "description": "This is the second template"
 }
 
+###
 ### template with no title - should fail
 POST http://localhost:3000/templates
 Content-Type: application/json
@@ -84,6 +88,7 @@ Content-Type: application/json
   ]
 }
 
+###
 ### template with no description - should fail
 POST http://localhost:3000/templates
 Content-Type: application/json
@@ -99,6 +104,7 @@ Content-Type: application/json
   ]
 }
 
+###
 ### update a template - should succeed on first attempt
 PUT http://localhost:3000/templates/First%20Template
 Content-Type: application/json
@@ -134,6 +140,7 @@ Content-Type: application/json
   ]
 }
 
+###
 ### delete a template - should succeed on first attempt
 DELETE http://localhost:3000/templates/Second%20Template
 ```

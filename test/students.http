@@ -1,0 +1,233 @@
+### Create Student First
+POST http://localhost:3000/api/v1/students
+Content-Type: application/json
+
+{
+  "firstName": "First",
+  "lastName": "Student",
+  "phone": "123-456-7890",
+  "email": "firstStudent@first.com",
+  "eventDate": "2025-06-01",
+  "scheduledEmails": [
+    {
+      "scheduledDate": "2025-06-01"
+    },
+    {
+      "scheduledDate": "2025-06-02"
+    },
+    {
+      "scheduledDate": "2025-06-03"
+    }
+  ]
+}
+
+###
+### Create Hayim Student
+POST http://localhost:3000/api/v1/students
+Content-Type: application/json
+
+{
+  "firstName": "Hayim",
+  "lastName": "Student",
+  "phone": "123-456-7890",
+  "email": "chayimdeutsch@gmail.com",
+  "eventDate": "2025-06-01",
+  "scheduledEmails": [
+    {
+      "scheduledDate": "2025-06-01"
+    },
+    {
+      "scheduledDate": "2025-06-02"
+    },
+    {
+      "scheduledDate": "2025-06-03"
+    }
+  ]
+}
+
+###
+### Create Student Second
+POST http://localhost:3000/api/v1/students
+Content-Type: application/json
+
+{
+  "firstName": "Second",
+  "lastName": "Student",
+  "phone": "123-456-7890",
+  "email": "secondStudent@second.com",
+  "eventDate": "2025-06-01",
+  "scheduledEmails": [
+    {
+      "scheduledDate": "2025-06-01"
+    },
+    {
+      "scheduledDate": "2025-06-02"
+    },
+    {
+      "scheduledDate": "2025-06-03"
+    }
+  ]
+}
+
+###
+### Get Students
+GET http://localhost:3000/api/v1/students
+
+###
+### Get Student By ID First
+GET http://localhost:3000/api/v1/students/67842793264a4985c1613ef7
+
+###
+### Update Student First
+PUT http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/emails
+Content-Type: application/json
+
+{
+  "scheduledEmails": [
+    {
+      "scheduledDate": "2025-06-01"
+    },
+    {
+      "scheduledDate": "2025-06-02"
+    },
+    {
+      "scheduledDate": "2025-06-03"
+    },
+    {
+      "scheduledDate": "2025-06-04"
+    }
+  ]
+}
+
+###
+### Delete Student Second
+DELETE http://localhost:3000/api/v1/students/6784278f264a4985c1613eef
+###
+
+### Follow-Up Requests ###
+### Get Follow-Ups
+GET http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups
+
+### Create a Follow-Up Request
+POST http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups
+Content-Type: application/json
+
+{
+  "options" :
+  {
+    "isQuestionnaire": true,
+    "isMeeting": true
+  },
+  "title": "Sample Follow-Up",
+  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire and select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      }
+    ]
+  },
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+
+###
+### Follow-Up Request with only Questionnaire
+POST http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups
+Content-Type: application/json
+
+{
+  "token": "7654321",
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+###
+### Follow-Up Request with only Meeting
+POST http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups
+Content-Type: application/json
+
+{
+  "token": "987654321",
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      }
+    ]
+  } 
+}
+###
+
+### Get Follow-Up By ID
+GET http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups/6784d822716afe062b76ae90
+
+###
+### Update Follow-Up By ID
+PUT http://localhost:3000/api/v1/students/67842793264a4985c1613ef7/followups/6784d822716afe062b76ae90
+Content-Type: application/json
+
+{
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      },
+      {
+        "startTime": "2023-10-03T14:00:00Z",
+        "endTime": "2023-10-03T15:00:00Z"
+      }
+    ]
+  },
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      },
+      {
+        "question": "What is your age?",
+        "hasRange": true,
+        "hasSentence": false
+      }
+    ]
+  }
+}

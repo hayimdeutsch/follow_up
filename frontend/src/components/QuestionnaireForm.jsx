@@ -3,12 +3,12 @@ import Question from "./Question";
 import QuestionForm from "./QuestionForm";
 
 const QuestionnaireForm = ({ onQuestionnaireChange }) => {
+  const [title, setTitle] = useState("");
   const [questions, setQuestions] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
 
   useEffect(() => {
-    // Fetch templates when the component is rendered
     fetch("http://localhost:3000/templates", {
       credentials: "include",
     })
@@ -37,8 +37,8 @@ const QuestionnaireForm = ({ onQuestionnaireChange }) => {
   }, [selectedTemplate]);
 
   useEffect(() => {
-    onQuestionnaireChange(questions);
-  }, [questions, onQuestionnaireChange]);
+    onQuestionnaireChange({ title, questions });
+  }, [questions, title, onQuestionnaireChange]);
 
   const handleAddQuestion = (question) => {
     setQuestions([...questions, question]);
@@ -51,6 +51,12 @@ const QuestionnaireForm = ({ onQuestionnaireChange }) => {
 
   return (
     <div>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Enter questionnaire title"
+      />
       <select
         value={selectedTemplate}
         onChange={(e) => setSelectedTemplate(e.target.value)}

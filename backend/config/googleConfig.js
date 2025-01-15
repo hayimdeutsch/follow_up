@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import "dotenv/config";
 
 export default {
   clientID: process.env.GOOGLE_CLIENT_ID,

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import checkAuthenticated from "../middleware/checkAuthenticated.js";
 import {
   checkApprovalStatus,
   saveRedirectToSession,
@@ -18,6 +19,6 @@ authRouter.get("/google/callback", googleAuthCallbackRedirect);
 
 authRouter.get("/logout", logout);
 
-authRouter.get("/user", getUser);
+authRouter.get("/user", checkAuthentication, getUser);
 
 export default authRouter;

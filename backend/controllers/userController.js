@@ -20,10 +20,9 @@ const getApprovedUsers = async (req, res, next) => {
 };
 
 const approveUser = async (req, res, next) => {
-  console.log("req.params", req.params);
-  const { gmail } = req.params;
+  const { userId } = req.params;
   try {
-    const user = await dbService.approveUser(gmail);
+    const user = await dbService.approveUserById(userId);
     if (!user) {
       throw new CustomError("User not found", 404);
     }
@@ -33,11 +32,27 @@ const approveUser = async (req, res, next) => {
   }
 };
 
-const createUserAndApprove = async (req, res, next) => {
-  const { name, email } = req.body;
+const createApprovedUser = async (req, res, next) => {
+  const { firstName, lastName, phone, gmail } = req.body;
   try {
-    const newUser = await dbService.createApprovedUser(name, email);
+    if (!firstName || !lastName || !phone || !gmail) {
+      throw new CustomError("Missing required fields", 400);
+    }
+    const newUser = await dbService.createApprovedUser(req.body);
     res.status(201).json(newUser);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  const { userId } = req.params;
+  try {
+    const user = await dbService.deleteUserById(userId);
+    if (!user) {
+      throw new CustomError("User not found", 404);
+    }
+    res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     next(error);
   }
@@ -47,6 +62,6 @@ export {
   getPendingUsers,
   getApprovedUsers,
   approveUser,
-  createUserAndApprove,
-  checkAdminForLogin,
+  deleteUser,
+  createApprovedUser,
 };

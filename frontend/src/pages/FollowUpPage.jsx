@@ -11,8 +11,8 @@ const FollowUpPage = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || generateToken();
   const [emailText, setEmailText] = useState("");
-  const [questionnaire, setQuestionnaire] = useState([]);
-  const [meetingDetails, setMeetingDetails] = useState({});
+  const [questionnaire, setQuestionnaire] = useState({});
+  const [meeting, setMeeting] = useState({});
   const [isQuestionnaire, setIsQuestionnaire] = useState(
     location.state?.options?.sendQuestionnaire || false
   );
@@ -20,6 +20,9 @@ const FollowUpPage = () => {
     location.state?.options?.scheduleMeeting || false
   );
   const student = location.state?.student;
+  const [title, setTitle] = useState(
+    `Follow-up for ${student.firstName} ${student.lastName}`
+  );
 
   const handleSubmit = async () => {
     const convertToHtml = (text) => {
@@ -32,21 +35,24 @@ const FollowUpPage = () => {
     const emailHtml = convertToHtml(emailText);
 
     try {
-      const response = await fetch(`http://localhost:3000/teachers/followup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          studentId,
-          emailContent: emailHtml,
-          token,
-          options: { isQuestionnaire, isMeeting },
-          questionnaire,
-          meetingDetails,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/followups/${studentId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            title,
+            emailText: emailHtml,
+            token,
+            options: { isQuestionnaire, isMeeting },
+            questionnaire,
+            meeting,
+          }),
+        }
+      );
       if (response.ok) {
         alert("Follow-up submitted successfully!");
       } else {
@@ -68,6 +74,13 @@ const FollowUpPage = () => {
   return (
     <div>
       <h1>{`Follow Up for ${student.firstName} ${student.lastName}`}</h1>
+      <label> Title: </label>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Enter the title of the follow-up"
+      />
       <button onClick={toggleSendQuestionnaire}>
         {isQuestionnaire ? "Remove Questionnaire" : "Add Questionnaire"}
       </button>
@@ -77,7 +90,7 @@ const FollowUpPage = () => {
       {isQuestionnaire && (
         <QuestionnaireForm onQuestionnaireChange={setQuestionnaire} />
       )}
-      {isMeeting && <MeetingSelector onMeetingChange={setMeetingDetails} />}
+      {isMeeting && <MeetingSelector onMeetingChange={setMeeting} />}
       <EmailForm
         student={student}
         token={token}

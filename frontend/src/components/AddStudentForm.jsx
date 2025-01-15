@@ -5,18 +5,20 @@ const AddStudentForm = ({ teacher }) => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [eventDate, setEventDate] = useState("");
-  const [followUpEmails, setFollowUpEmails] = useState([{ scheduledDate: "" }]);
+  const [scheduledEmails, setScheduledEmails] = useState([
+    { scheduledDate: "" },
+  ]);
   const [error, setError] = useState("");
 
   const handleAddFollowUp = () => {
-    setFollowUpEmails([...followUpEmails, { scheduledDate: "" }]);
+    setScheduledEmails([...scheduledEmails, { scheduledDate: "" }]);
   };
 
   const handleFollowUpChange = (index, value) => {
-    const newFollowUpEmails = followUpEmails.map((followUp, i) =>
+    const newScheduledEmails = scheduledEmails.map((followUp, i) =>
       i === index ? { scheduledDate: value } : followUp
     );
-    setFollowUpEmails(newFollowUpEmails);
+    setScheduledEmails(newScheduledEmails);
   };
 
   const handleSubmit = async (e) => {
@@ -33,7 +35,7 @@ const AddStudentForm = ({ teacher }) => {
           lastName,
           email,
           eventDate,
-          followUpEmails,
+          scheduledEmails,
         }),
       });
       if (response.ok) {
@@ -43,7 +45,7 @@ const AddStudentForm = ({ teacher }) => {
         setLastName("");
         setEmail("");
         setEventDate("");
-        setFollowUpEmails([{ scheduledDate: "" }]);
+        setScheduledEmails([{ scheduledDate: "" }]);
       } else {
         setError("Failed to add student");
       }
@@ -92,7 +94,7 @@ const AddStudentForm = ({ teacher }) => {
       </div>
       <div>
         <label>Follow Up Emails:</label>
-        {followUpEmails.map((followUp, index) => (
+        {scheduledEmails.map((followUp, index) => (
           <div key={index}>
             <input
               type="date"

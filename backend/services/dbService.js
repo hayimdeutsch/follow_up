@@ -1,4 +1,4 @@
-import mongoose, { get, now } from "mongoose";
+import mongoose, { now } from "mongoose";
 import Teacher from "../models/Teacher.js";
 import Questionnaire from "../models/Questionnaire.js";
 import Template from "../models/Template.js";
@@ -22,7 +22,7 @@ const createUser = async (firstName, lastName, gmail, phone) => {
   }
 };
 
-const createApprovedUser = async (firstName, lastName, gmail, phone) => {
+const createApprovedUser = async ({ firstName, lastName, gmail, phone }) => {
   const newUser = new Teacher({
     firstName,
     lastName,
@@ -54,12 +54,18 @@ const saveUser = async (user) => {
   }
 };
 
-const approveUser = async (gmail) => {
+const approveUserById = async (userId) => {
   try {
-    const user = await Teacher.findOneAndUpdate(
-      { email: gmail },
-      { approved: true }
-    );
+    const user = await Teacher.findByIdAndUpdate(userId, { approved: true });
+    return user;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const deleteUserById = async (userId) => {
+  try {
+    const user = await Teacher.findByIdAndDelete(userId);
     return user;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
@@ -103,9 +109,18 @@ const getTeacherByGoogleId = async (googleId) => {
   }
 };
 
-const getAllTeachers = async () => {
+const getUnapprovedTeachers = async () => {
   try {
-    const teachers = await Teacher.find();
+    const teachers = await Teacher.find({ approved: false });
+    return teachers;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const getApprovedTeachers = async () => {
+  try {
+    const teachers = await Teacher.find({ approved: true });
     return teachers;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
@@ -168,9 +183,11 @@ const getTemplateByTitle = async (title) => {
   }
 };
 
-const updateTemplateByTitle = async (title, questions) => {
+const updateTemplateByTitle = async (title, updateObject) => {
   try {
-    const template = await Template.findOneAndUpdate({ title }, { questions });
+    const template = await Template.findOneAndUpdate({ title }, updateObject, {
+      new: true,
+    });
     return template;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
@@ -191,17 +208,17 @@ const addStudent = async (
   firstName,
   lastName,
   email,
-  eventdate,
-  followupEmails
+  eventDate,
+  followUpEmails
 ) => {
-  console.log("followUpEmails: ", followupEmails);
+  console.log("followUpEmails: ", followUpEmails);
   const newStudent = new Student({
     teacher: teacherId,
     firstName,
     lastName,
     email,
-    eventdate,
-    followupEmails,
+    eventDate,
+    scheduledEmails: followUpEmails,
   });
 
   try {
@@ -221,14 +238,17 @@ const addStudent = async (
 
 const getStudentById = async (studentId) => {
   try {
-    const student = await Student.findById(studentId);
+    const student = await Student.findById(studentId).populate([
+      "followUps",
+      "teacher",
+    ]);
     return student;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
 };
 
-const getStudents = async (teacherId) => {
+const getStudentsbyGoogleId = async (teacherId) => {
   try {
     const teacher = await Teacher.findOne(
       { googleId: teacherId },
@@ -242,62 +262,101 @@ const getStudents = async (teacherId) => {
   }
 };
 
+const deleteStudentById = async (studentId) => {
+  try {
+    const deletedStudent = await Student.findByIdAndDelete(studentId);
+    return deletedStudent;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const updateStudentEmails = async (studentId, followUpEmails) => {
+  console.log("followUpEmails: ", followUpEmails);
+  try {
+    const student = await Student.findByIdAndUpdate(
+      studentId,
+      { $set: { scheduledEmails: followUpEmails } },
+      { new: true }
+    );
+    return student;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
 const addStudentToTeacher = async (teacherId, student) => {
   const teacher = await Teacher.findById(teacherId);
   teacher.students.push(student._id);
   await teacher.save();
 };
 
-const createQuestionnaire = async (questionnaire) => {
+///////////////////////////////////////////////////
+const getStudentFollowUps = async (studentId) => {
   try {
-    const newQuestionnaire = new Questionnaire(questionnaire);
-    await newQuestionnaire.validate();
-    await newQuestionnaire.save();
-    return newQuestionnaire;
+    const student = await Student.findById(studentId).populate("followUps");
+    return student?.followUps;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
 };
 
-const getQuestionnaireById = async (questionnaireId) => {
+const getFollowUpById = async (followupId) => {
   try {
-    const questionnaire = await Questionnaire.findById(questionnaireId);
-    return questionnaire;
-  } catch (error) {
-    throw new CustomError("DB Error", 500, error);
-  }
-};
-
-const submitQuestionnaire = async (questionnaireId, questions) => {
-  try {
-    const questionnaire = await Questionnaire.findByIdAndUpdate(
-      questionnaireId,
+    const followUp = await FollowUp.findById(followupId).populate([
       {
-        $set: {
-          questions,
-          submitted: true,
-          submittedAt: now(),
-        },
-      }
-    );
+        path: "questionnaire",
+      },
+      {
+        path: "meeting",
+      },
+      {
+        path: "teacher",
+        select: "firstName lastName email phone googleId _id",
+      },
+      {
+        path: "student",
+        select: "firstName lastName email _id",
+      },
+    ]);
+    return followUp;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
 };
 
-const addQuestionnaireToStudent = async (studentId, questionnaire) => {
+const getFollowUpByToken = async (token) => {
   try {
-    const student = await Student.findById(studentId);
-    student.questionnaires.push(questionnaire._id);
-    await student.save();
+    const followUp = await FollowUp.findOne({ token }).populate([
+      {
+        path: "questionnaire",
+      },
+      {
+        path: "meeting",
+      },
+      {
+        path: "teacher",
+        select: "firstName lastName email phone googleId _id",
+      },
+      {
+        path: "student",
+        select: "firstName lastName email _id",
+      },
+    ]);
+    return followUp;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
 };
 
 const createMeeting = async (meeting) => {
+  const newMeeting = new Meeting(meeting);
   try {
-    const newMeeting = new Meeting(meeting);
+    await newMeeting.validate();
+  } catch (error) {
+    throw new CustomError("Validation Error", 400, error);
+  }
+  try {
     await newMeeting.save();
     return newMeeting;
   } catch (error) {
@@ -305,10 +364,106 @@ const createMeeting = async (meeting) => {
   }
 };
 
-const getMeetingById = async (meetingId) => {
+const createQuestionnaire = async (questionnaire) => {
+  const newQuestionnaire = new Questionnaire(questionnaire);
   try {
-    const meeting = await Meeting.findById(meetingId);
-    return meeting;
+    await newQuestionnaire.validate();
+  } catch (error) {
+    throw new CustomError("Validation Error", 400, error);
+  }
+  try {
+    await newQuestionnaire.save();
+    return newQuestionnaire;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const createFollowUp = async (
+  token,
+  title,
+  teacherId,
+  studentId,
+  meetingId,
+  questionnaireId
+) => {
+  const newFollowUp = new FollowUp({
+    token,
+    title,
+    teacher: teacherId,
+    student: studentId,
+    meeting: meetingId,
+    questionnaire: questionnaireId,
+  });
+
+  try {
+    await newFollowUp.validate();
+  } catch (error) {
+    throw new CustomError("Validation Error", 400, error);
+  }
+  try {
+    await newFollowUp.save();
+    return newFollowUp;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const addFollowupToStudent = async (studentId, followUpId) => {
+  try {
+    const student = await Student.findById(studentId);
+    student.followUps.push(followUpId);
+    await student.save();
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const updateFollowUpById = async (followupId, updatedFollowUp) => {
+  try {
+    const followUp = await FollowUp.findByIdAndUpdate(
+      followupId,
+      updatedFollowUp,
+      { new: true }
+    ).populate([
+      {
+        path: "questionnaire",
+      },
+      {
+        path: "meeting",
+      },
+      {
+        path: "teacher",
+        select: "firstName lastName email phone googleId _id",
+      },
+      {
+        path: "student",
+        select: "firstName lastName email _id",
+      },
+    ]);
+
+    return followUp;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const deleteFollowUpById = async (followupId) => {
+  try {
+    const followUp = await FollowUp.findByIdAndDelete(followupId);
+    return followUp;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const deleteFollowUpFromStudent = async (studentId, followUpId) => {
+  try {
+    const student = await Student.findById(studentId);
+    student.followUps = student.followUps.filter(
+      (followUp) => followUp._id !== followUpId
+    );
+    await student.save();
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
@@ -327,42 +482,42 @@ const confirmMeeting = async (meetingId, selectedTimeSlot, googleEventId) => {
   }
 };
 
-const createFollowup = async (
-  token,
-  teacherId,
-  studentId,
-  meetingId,
-  questionnaireId
-) => {
-  const newFollowUp = new FollowUp({
-    token,
-    teacher: teacherId,
-    student: studentId,
-    meeting: meetingId,
-    questionnaire: questionnaireId,
-  });
-
+const submitQuestionnaire = async (questionnaireId, questions) => {
   try {
-    await newFollowUp.validate();
-  } catch (error) {
-    throw new CustomError("Validation Error", 400, error);
-  }
-
-  try {
-    await newFollowUp.save();
-    return newFollowUp;
+    const questionnaire = await Questionnaire.findByIdAndUpdate(
+      questionnaireId,
+      {
+        $set: {
+          questions,
+        },
+      }
+    );
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
 };
 
-const getFollowUpByToken = async (token) => {
+const submitFollowUpByToken = async (token) => {
   try {
-    const followUp = await FollowUp.findOne({ token }).populate([
-      "questionnaire",
-      "meeting",
-      "teacher",
-      "student",
+    const followUp = await FollowUp.findOneAndUpdate(
+      { token },
+      { submitted: true, submittedAt: now() },
+      { new: true }
+    ).populate([
+      {
+        path: "questionnaire",
+      },
+      {
+        path: "meeting",
+      },
+      {
+        path: "teacher",
+        select: "firstName lastName email phone googleId _id",
+      },
+      {
+        path: "student",
+        select: "firstName lastName email _id",
+      },
     ]);
     return followUp;
   } catch (error) {
@@ -370,56 +525,100 @@ const getFollowUpByToken = async (token) => {
   }
 };
 
-const submitFollowUp = async (token) => {
+const updateQuestionnaireById = async (questionnaireId, questions) => {
   try {
-    await FollowUp.findOneAndUpdate(
-      { token },
-      { submitted: true, submittedAt: now() }
+    const questionnaire = await Questionnaire.findByIdAndUpdate(
+      questionnaireId,
+      { questions },
+      { new: true }
     );
-    const followUp = await getFollowUpByToken(token);
-    return followUp;
+    return questionnaire;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
 };
 
-const addFollowupToStudent = async (studentId, followUp) => {
+const updateMeetingById = async (meetingId, timeSlots) => {
   try {
-    const student = await Student.findById(studentId);
-    student.followUps.push(followUp._id);
-    await student.save();
+    const meeting = await Meeting.findByIdAndUpdate(
+      meetingId,
+      { timeSlots },
+      { new: true }
+    );
+    return meeting;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
 };
 
+/////////////////////////////////////////////////////
 export {
   createUser,
   createApprovedUser,
   saveUser,
-  approveUser,
+  approveUserById,
+  deleteUserById,
   isUserApproved,
   getTeacherById,
   getTeacherByGmail,
   getTeacherByGoogleId,
-  getAllTeachers,
+  getUnapprovedTeachers,
+  getApprovedTeachers,
   createTemplate,
   getAllTemplates,
   getTemplateByTitle,
   updateTemplateByTitle,
   deleteTemplateByTitle,
   addStudent,
-  getStudents,
+  getStudentsbyGoogleId,
   getStudentById,
-  createQuestionnaire,
-  getQuestionnaireById,
-  submitQuestionnaire,
-  addQuestionnaireToStudent,
-  createMeeting,
-  getMeetingById,
-  confirmMeeting,
-  createFollowup,
+  deleteStudentById,
+  updateStudentEmails,
+  getStudentFollowUps,
+  getFollowUpById,
   getFollowUpByToken,
-  submitFollowUp,
+  createMeeting,
+  createQuestionnaire,
+  createFollowUp,
   addFollowupToStudent,
+  updateFollowUpById,
+  deleteFollowUpById,
+  deleteFollowUpFromStudent,
+  confirmMeeting,
+  submitQuestionnaire,
+  submitFollowUpByToken,
+  updateQuestionnaireById,
+  updateMeetingById,
 };
+
+//////////////////////////////////////////////////
+
+const getQuestionnaireById = async (questionnaireId) => {
+  try {
+    const questionnaire = await Questionnaire.findById(questionnaireId);
+    return questionnaire;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const addQuestionnaireToStudent = async (studentId, questionnaire) => {
+  try {
+    const student = await Student.findById(studentId);
+    student.questionnaires.push(questionnaire._id);
+    await student.save();
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const getMeetingById = async (meetingId) => {
+  try {
+    const meeting = await Meeting.findById(meetingId);
+    return meeting;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+export { getQuestionnaireById, addQuestionnaireToStudent, getMeetingById };

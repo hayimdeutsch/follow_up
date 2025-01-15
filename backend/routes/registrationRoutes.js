@@ -9,13 +9,13 @@ import { newUserApplicationTemplate } from "../utils/emailTemplates.js";
 const registrationRouter = Router();
 
 registrationRouter.post("/", async (req, res, next) => {
-  const { firstName, lastName, gmail, phone } = req.body;
-
-  if (!firstName || !lastName || !gmail || !phone) {
-    return next(new CustomError("All fields are required", 400));
-  }
-
   try {
+    const { firstName, lastName, gmail, phone } = req.body;
+
+    if (!firstName || !lastName || !gmail || !phone) {
+      throw new CustomError("All fields are required", 400);
+    }
+
     await createUser(firstName, lastName, gmail, phone);
 
     await sendFromSystem(

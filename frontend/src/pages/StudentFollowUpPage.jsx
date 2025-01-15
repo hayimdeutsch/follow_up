@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import Questionnaire from "../components/Questionnaire";
+import MeetingTimeSelector from "../components/MeetingTimeSelector";
 
 const StudentFollowUpPage = () => {
   const { token } = useParams();
   const [questionnaire, setQuestionnaire] = useState(null);
   const [meetingDetails, setMeetingDetails] = useState(null);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -12,7 +15,7 @@ const StudentFollowUpPage = () => {
     const fetchFollowUp = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/followup/${token}`,
+          `http://localhost:3000/followups/${token}`,
           {
             credentials: "include",
           }
@@ -20,12 +23,12 @@ const StudentFollowUpPage = () => {
         if (response.ok) {
           const data = await response.json();
           setQuestionnaire(data.questionnaire);
-          setMeetingDetails(data.meetingDetails);
+          setMeetingDetails(data.meeting);
         } else {
           setError("Failed to fetch follow-up details");
         }
       } catch (error) {
-        setError("Error fetching follow-up details: " + error.message);
+        setError("Error: " + error.message);
       } finally {
         setLoading(false);
       }
@@ -34,34 +37,34 @@ const StudentFollowUpPage = () => {
     fetchFollowUp();
   }, [token]);
 
-  const handleInputChange = (index, field, value) => {
-    const updatedQuestions = [...questionnaire.questions];
-    if (field === "range") {
-      updatedQuestions[index].range.studentAnswer = value;
-    } else {
-      updatedQuestions[index].sentenceAnswer = value;
-    }
-    setQuestionnaire({ ...questionnaire, questions: updatedQuestions });
+  const handleQuestionnaireChange = (updatedQuestions) => {
+    setQuestionnaire((prev) => ({ ...prev, questions: updatedQuestions }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleTimeSlotChange = (timeSlot) => {
+    setSelectedTimeSlot(timeSlot);
+  };
+
+  const handleSubmit = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/followup/${token}`, {
+      const response = await fetch(`http://localhost:3000/followups/${token}`, {
         method: "PUT",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
-        body: JSON.stringify({ questionnaire, meetingDetails }),
+        body: JSON.stringify({
+          questions: questionnaire?.questions,
+          selectedTimeSlot,
+        }),
       });
       if (response.ok) {
         alert("Follow-up submitted successfully!");
       } else {
-        alert("Failed to submit follow-up");
+        setError("Failed to submit follow-up");
       }
     } catch (error) {
-      console.error("Error submitting follow-up:", error);
+      setError("Error: " + error.message);
     }
   };
 
@@ -70,75 +73,25 @@ const StudentFollowUpPage = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div>Error: {error}</div>;
   }
 
   return (
     <div>
-      <h1>Follow-Up</h1>
-      <form onSubmit={handleSubmit}>
-        {questionnaire && (
-          <>
-            <h2>{questionnaire.title}</h2>
-            {questionnaire.questions.map((question, index) => (
-              <div key={index}>
-                <p>{question.question}</p>
-                {question.hasRange ? (
-                  <div>
-                    <label>
-                      Range ({question.range.min} - {question.range.max}):
-                      <input
-                        type="number"
-                        min={question.range.min}
-                        max={question.range.max}
-                        value={question.range.studentAnswer || ""}
-                        onChange={(e) =>
-                          handleInputChange(index, "range", e.target.value)
-                        }
-                        required
-                      />
-                    </label>
-                  </div>
-                ) : (
-                  <div>
-                    <label>
-                      Answer:
-                      <input
-                        type="text"
-                        value={question.sentenceAnswer || ""}
-                        onChange={(e) =>
-                          handleInputChange(index, "sentence", e.target.value)
-                        }
-                        required
-                      />
-                    </label>
-                  </div>
-                )}
-              </div>
-            ))}
-          </>
-        )}
-        {meetingDetails && (
-          <div>
-            <h2>Schedule Meeting</h2>
-            <label>
-              Select a time:
-              <input
-                type="datetime-local"
-                value={meetingDetails.scheduledTime || ""}
-                onChange={(e) =>
-                  setMeetingDetails({
-                    ...meetingDetails,
-                    scheduledTime: e.target.value,
-                  })
-                }
-                required
-              />
-            </label>
-          </div>
-        )}
-        <button type="submit">Submit</button>
-      </form>
+      <h1>Student Follow-Up</h1>
+      {questionnaire && (
+        <Questionnaire
+          questionnaire={questionnaire}
+          onAnswerChange={handleQuestionnaireChange}
+        />
+      )}
+      {meetingDetails && (
+        <MeetingTimeSelector
+          meetingDetails={meetingDetails}
+          onTimeSlotChange={handleTimeSlotChange}
+        />
+      )}
+      <button onClick={handleSubmit}>Submit Follow-Up</button>
     </div>
   );
 };
