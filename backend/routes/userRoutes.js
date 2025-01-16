@@ -10,12 +10,16 @@ import {
   getPendingUsers,
 } from "../controllers/userController.js";
 import mockAuthenticated from "../mocks/mockAuthenticated.js";
+import mockAdminCheck from "../mocks/mockAdminCheck.js";
 
 const userRouter = Router();
 
-// userRouter.use(checkAuthenticated);
-// userRouter.use(checkAdmin);
-userRouter.use(mockAuthenticated);
+//All routes tested using mockAuthenticated and mockAdminCheck
+userRouter.use(checkAuthenticated);
+// userRouter.use(mockAuthenticated);
+
+userRouter.use(checkAdmin);
+// userRouter.use(mockAdminCheck);
 
 userRouter.get("/pending", getPendingUsers);
 userRouter.get("/approved", getApprovedUsers);

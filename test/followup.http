@@ -1,86 +1,1170 @@
-### Get Follow-Up with both Meeting and Questionnaire by token
-GET http://localhost:3000/api/v1/followups/1234567
+### Get First Student Follow-Ups
+GET http://localhost:3000/api/v1/students/6787ff73673d5a06e3e0b595/followups
+
+# Response
+# HTTP/1.1 200 OK
+# []
 
 ###
-### Get Follow-Up with only Questionnaire by token
-GET http://localhost:3000/api/v1/followups/7654321
+### Get Hayim Student Follow-Ups
+GET http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+
+# Response
+# HTTP/1.1 200 OK
+# [
+#   {
+#     "_id": "67880254309a18161a490920",
+#     "token": "af464023fd077ccd",
+#     "title": "Sample Follow-Up",
+#     "student": "6787ff7b673d5a06e3e0b59d",
+#     "teacher": "677e5992cc047516b454a80a",
+#     "questionnaire": "67880254309a18161a49091d",
+#     "meeting": "67880254309a18161a490919",
+#     "submitted": false,
+#     "__v": 0
+#   },
+#   {
+#     "_id": "6788140d48cdc2d7176801e3",
+#     "token": "88d975cbb0308960",
+#     "title": "Sample Follow-Up",
+#     "student": "6787ff7b673d5a06e3e0b59d",
+#     "teacher": "677e5992cc047516b454a80a",
+#     "questionnaire": "6788140d48cdc2d7176801e0",
+#     "meeting": null,
+#     "submitted": false,
+#     "__v": 0
+#   },
+#   {
+#     "_id": "6788148f48cdc2d7176801f2",
+#     "token": "efeeab9572d630a8",
+#     "title": "Follow-Up Meeting",
+#     "student": "6787ff7b673d5a06e3e0b59d",
+#     "teacher": "677e5992cc047516b454a80a",
+#     "questionnaire": null,
+#     "meeting": "6788148f48cdc2d7176801ed",
+#     "submitted": false,
+#     "__v": 0
+#   }
+# ]
+
 ###
-### Get Follow-Up with only Meeting by token
-GET http://localhost:3000/api/v1/followups/987654321
-###
-### Get Follow-Up with invalid token
-GET http://localhost:3000/api/v1/followups/invalidtoken
-###
-### Submit Follow-Up with both Meeting and Questionnaire by token
-PUT http://localhost:3000/api/v1/followups/1234567
+### Create a Follow-Up for Hayim Student
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
 Content-Type: application/json
 
 {
-  "subject": "Follow-Up Meeting",
-  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire and select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
-  "selectedTimeSlot": {
-    "startTime": "2023-10-01T10:00:00Z",
-    "endTime": "2023-10-01T11:00:00Z"
+  "options" :
+  {
+    "isQuestionnaire": true,
+    "isMeeting": true
   },
+  "title": "Sample Follow-Up",
+  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire and select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      }
+    ]
+  },
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+
+# Response
+# HTTP/1.1 201 Created
+# {
+#   "token": "af464023fd077ccd",
+#   "title": "Sample Follow-Up",
+#   "student": "6787ff7b673d5a06e3e0b59d",
+#   "teacher": "677e5992cc047516b454a80a",
+#   "questionnaire": "67880254309a18161a49091d",
+#   "meeting": "67880254309a18161a490919",
+#   "submitted": false,
+#   "_id": "67880254309a18161a490920",
+#   "__v": 0
+# }
+
+###
+### Follow-Up Request with only Questionnaire
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+Content-Type: application/json
+
+{
+  "token": "7654321",
+  "title": "Sample Follow-Up",
+  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "options" :
+  {
+    "isQuestionnaire": true,
+    "isMeeting": false
+  },
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+
+# Response
+# HTTP/1.1 201 Created
+# {
+#   "token": "88d975cbb0308960",
+#   "title": "Sample Follow-Up",
+#   "student": "6787ff7b673d5a06e3e0b59d",
+#   "teacher": "677e5992cc047516b454a80a",
+#   "questionnaire": "6788140d48cdc2d7176801e0",
+#   "meeting": null,
+#   "submitted": false,
+#   "_id": "6788140d48cdc2d7176801e3",
+#   "__v": 0
+# }
+
+###
+### Follow-Up Request with Questionnaire that has a range question
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+Content-Type: application/json
+
+{
+  "title": "Followup with only Questionnaire and a range questions",
+  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "options" :
+  {
+    "isQuestionnaire": true,
+    "isMeeting": false
+  },
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": true,
+        "hasSentence": true,
+        "range": {
+          "min": 0,
+          "max": 10
+        }
+      }
+    ]
+  }
+}
+
+# Response
+# HTTP/1.1 201 Created
+# {
+#   "token": "1ee8c370cd53dd44",
+#   "title": "Followup with only Questionnaire and a range questions",
+#   "student": "6787ff7b673d5a06e3e0b59d",
+#   "teacher": "677e5992cc047516b454a80a",
+#   "questionnaire": "6788c98ea652e37745628602",
+#   "meeting": null,
+#   "submitted": false,
+#   "_id": "6788c98ea652e37745628605",
+#   "__v": 0
+# }
+
+###
+### Follow-Up Request with only Meeting
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+Content-Type: application/json
+
+{
+  "token": "987654321",
+  "title": "Follow-Up Meeting",
+  "emailText": "<html><body>Thank you for your time. Please select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "options" :
+  {
+    "isQuestionnaire": false,
+    "isMeeting": true
+  },
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      }
+    ]
+  } 
+}
+
+# Response
+# HTTP/1.1 201 Created
+# {
+#   "token": "efeeab9572d630a8",
+#   "title": "Follow-Up Meeting",
+#   "student": "6787ff7b673d5a06e3e0b59d",
+#   "teacher": "677e5992cc047516b454a80a",
+#   "questionnaire": null,
+#   "meeting": "6788148f48cdc2d7176801ed",
+#   "submitted": false,
+#   "_id": "6788148f48cdc2d7176801f2",
+#   "__v": 0
+# }
+
+###
+### Follow-Up Request with only Meeting for submission
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+Content-Type: application/json
+
+{
+  "token": "987654321",
+  "title": "Follow-Up Meeting for submission",
+  "emailText": "<html><body>Thank you for your time. Please select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "options" :
+  {
+    "isQuestionnaire": false,
+    "isMeeting": true
+  },
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      }
+    ]
+  } 
+}
+
+# Response
+# HTTP/1.1 201 Created
+# {
+#   "token": "12760bd924c141cc",
+#   "title": "Follow-Up Meeting for submission",
+#   "student": "6787ff7b673d5a06e3e0b59d",
+#   "teacher": "677e5992cc047516b454a80a",
+#   "questionnaire": null,
+#   "meeting": "6788cc437996b9cd7bc6748f",
+#   "submitted": false,
+#   "_id": "6788cc437996b9cd7bc67494",
+#   "__v": 0
+# }
+
+###
+### Follow-Up Request with no Questionnaire or Meeting
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+Content-Type: application/json
+
+{
+  "title": "Follow-Up",
+  "emailText": "<html><body>Thank you for your time. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "options" :
+  {
+    "isQuestionnaire": false,
+    "isMeeting": false
+  }
+}
+
+# Response
+# HTTP/1.1 400 Bad Request
+# {
+#   "message": "Follow-Up must have a questionnaire or meeting."
+
+###
+### Follow-Up Request without Title
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+Content-Type: application/json
+
+{
+  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire and select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "options" :
+  {
+    "isQuestionnaire": true,
+    "isMeeting": true
+  },
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      }
+    ]
+  },
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+
+# Response
+# HTTP/1.1 400 Bad Request
+# {
+#   "message": "Missing required fields: [title]"
+# }
+
+###
+### Follow-Up Request without Email Text
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+Content-Type: application/json
+
+{
+  "title": "Sample Follow-Up",
+  "options" :
+  {
+    "isQuestionnaire": true,
+    "isMeeting": true
+  },
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      }
+    ]
+  },
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+
+# Response
+# HTTP/1.1 400 Bad Request
+# {
+#   "message": "Missing required fields: [emailText]"
+# }
+
+###
+### Follow-Up Request without empty body
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+Content-Type: application/json
+
+{}
+
+# Response
+# HTTP/1.1 400 Bad Request
+# {
+#   "message": "Missing required fields: [title, options, emailText]"
+# }
+
+###
+### Follow-Up Request with options.meeting and no meeting object
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+Content-Type: application/json
+
+{
+  "title": "Sample Follow-Up",
+  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire and select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "options" :
+  {
+    "isQuestionnaire": false,
+    "isMeeting": true
+  },
+}
+
+# Response
+# HTTP/1.1 400 Bad Request
+# {
+#   "message": "Missing required fields: [meeting]"
+# }
+
+###
+### Follow-Up Request with invalid student ID
+POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b594/followups
+Content-Type: application/json
+
+{
+  "title": "Sample Follow-Up",
+  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire and select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  "options" :
+  {
+    "isQuestionnaire": true,
+    "isMeeting": true
+  },
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      }
+    ]
+  },
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+
+# Response
+# HTTP/1.1 404 Not Found
+# {
+#   "message": "Student not found"
+# }
+
+###
+### Get Follow-Up By ID
+GET http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/67880254309a18161a490920
+
+# Response
+# HTTP/1.1 200 OK
+# {
+#   "_id": "67880254309a18161a490920",
+#   "token": "af464023fd077ccd",
+#   "title": "Sample Follow-Up",
+#   "student": {
+#     "_id": "6787ff7b673d5a06e3e0b59d",
+#     "firstName": "Hayim",
+#     "lastName": "Student",
+#     "email": "chayimdeutsch@gmail.com"
+#   },
+#   "teacher": {
+#     "_id": "677e5992cc047516b454a80a",
+#     "firstName": "Hayim",
+#     "lastName": "Deutsch",
+#     "email": "chayimdeutsch@gmail.com",
+#     "phone": "123-456-7890",
+#     "googleId": "113882388930598865430"
+#   },
+#   "questionnaire": {
+#     "_id": "67880254309a18161a49091d",
+#     "title": "Sample Questionnaire",
+#     "questions": [
+#       {
+#         "question": "What is your name?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       }
+#     ],
+#     "__v": 0
+#   },
+#   "meeting": {
+#     "_id": "67880254309a18161a490919",
+#     "topic": "Math Tutoring",
+#     "duration": 60,
+#     "timeSlots": [
+#       {
+#         "startTime": "2023-10-01T10:00:00.000Z",
+#         "endTime": "2023-10-01T11:00:00.000Z",
+#         "_id": "67880254309a18161a49091a"
+#       },
+#       {
+#         "startTime": "2023-10-02T14:00:00.000Z",
+#         "endTime": "2023-10-02T15:00:00.000Z",
+#         "_id": "67880254309a18161a49091b"
+#       }
+#     ],
+#     "status": "awaiting_selection",
+#     "__v": 0
+#   },
+#   "submitted": false,
+#   "__v": 0
+# }
+
+###
+### Update Hayim Student's Follow-Up By ID
+PUT http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/67880254309a18161a490920
+Content-Type: application/json
+
+{
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      },
+      {
+        "startTime": "2023-10-02T14:00:00Z",
+        "endTime": "2023-10-02T15:00:00Z"
+      },
+      {
+        "startTime": "2023-10-03T14:00:00Z",
+        "endTime": "2023-10-03T15:00:00Z"
+      }
+    ]
+  },
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      },
+      {
+        "question": "What is your age?",
+        "hasRange": true,
+        "hasSentence": false
+      }
+    ]
+  }
+}
+
+# Response
+# HTTP/1.1 200 OK
+
+# {
+#   "_id": "67880254309a18161a490920",
+#   "token": "af464023fd077ccd",
+#   "title": "Sample Follow-Up",
+#   "student": {
+#     "_id": "6787ff7b673d5a06e3e0b59d",
+#     "firstName": "Hayim",
+#     "lastName": "Student",
+#     "email": "chayimdeutsch@gmail.com"
+#   },
+#   "teacher": {
+#     "_id": "677e5992cc047516b454a80a",
+#     "firstName": "Hayim",
+#     "lastName": "Deutsch",
+#     "email": "chayimdeutsch@gmail.com",
+#     "phone": "123-456-7890",
+#     "googleId": "113882388930598865430"
+#   },
+#   "questionnaire": {
+#     "_id": "67880254309a18161a49091d",
+#     "title": "Sample Questionnaire",
+#     "questions": [
+#       {
+#         "question": "What is your name?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       },
+#       {
+#         "question": "What is your age?",
+#         "hasRange": true,
+#         "hasSentence": false
+#       }
+#     ],
+#     "__v": 0
+#   },
+#   "meeting": {
+#     "_id": "67880254309a18161a490919",
+#     "topic": "Math Tutoring",
+#     "duration": 60,
+#     "timeSlots": [
+#       {
+#         "startTime": "2023-10-01T10:00:00.000Z",
+#         "endTime": "2023-10-01T11:00:00.000Z",
+#         "_id": "6788b9810b973094a5e368fd"
+#       },
+#       {
+#         "startTime": "2023-10-02T14:00:00.000Z",
+#         "endTime": "2023-10-02T15:00:00.000Z",
+#         "_id": "6788b9810b973094a5e368fe"
+#       },
+#       {
+#         "startTime": "2023-10-03T14:00:00.000Z",
+#         "endTime": "2023-10-03T15:00:00.000Z",
+#         "_id": "6788b9810b973094a5e368ff"
+#       }
+#     ],
+#     "status": "awaiting_selection",
+#     "__v": 0
+#   },
+#   "submitted": false,
+#   "__v": 0
+# }
+
+###
+### Update Hayim Student's Follow-Up just meeting
+PUT http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/6788148f48cdc2d7176801f2
+Content-Type: application/json
+
+{
+  "meeting": {
+    "topic": "Math Tutoring",
+    "duration": 60,
+    "timeSlots": [
+      {
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z"
+      }
+    ]
+  }
+}
+
+
+# Response
+# HTTP/1.1 200 OK
+# {
+#   "_id": "6788148f48cdc2d7176801f2",
+#   "token": "efeeab9572d630a8",
+#   "title": "Follow-Up Meeting",
+#   "student": {
+#     "_id": "6787ff7b673d5a06e3e0b59d",
+#     "firstName": "Hayim",
+#     "lastName": "Student",
+#     "email": "chayimdeutsch@gmail.com"
+#   },
+#   "teacher": {
+#     "_id": "677e5992cc047516b454a80a",
+#     "firstName": "Hayim",
+#     "lastName": "Deutsch",
+#     "email": "chayimdeutsch@gmail.com",
+#     "phone": "123-456-7890",
+#     "googleId": "113882388930598865430"
+#   },
+#   "questionnaire": null,
+#   "meeting": {
+#     "_id": "6788148f48cdc2d7176801ed",
+#     "topic": "Math Tutoring",
+#     "duration": 60,
+#     "timeSlots": [
+#       {
+#         "startTime": "2023-10-01T10:00:00.000Z",
+#         "endTime": "2023-10-01T11:00:00.000Z",
+#         "_id": "6788bcf83b2eaf9a6c97ca01"
+#       }
+#     ],
+#     "status": "awaiting_selection",
+#     "__v": 0
+#   },
+#   "submitted": false,
+#   "__v": 0
+# }
+
+###
+### Update Hayim Student's Follow-Up just questionnaire
+PUT http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/6788140d48cdc2d7176801e3
+Content-Type: application/json
+
+{
+  "questionnaire": {
+    "title": "Sample Questionnaire",
+    "questions": [
+      {
+        "question": "What is your name?",
+        "hasRange": false,
+        "hasSentence": true
+      },
+      {
+        "question": "What is your age?",
+        "hasRange": true,
+        "hasSentence": false
+      },
+      {
+        "question": "What is your favorite color?",
+        "hasRange": false,
+        "hasSentence": true
+      },
+      {
+        "question": "What is your favorite food?",
+        "hasRange": false,
+        "hasSentence": true
+      }
+    ]
+  }
+}
+
+# Response
+# HTTP/1.1 200 OK
+# {
+#   "_id": "6788140d48cdc2d7176801e3",
+#   "token": "88d975cbb0308960",
+#   "title": "Sample Follow-Up",
+#   "student": {
+#     "_id": "6787ff7b673d5a06e3e0b59d",
+#     "firstName": "Hayim",
+#     "lastName": "Student",
+#     "email": "chayimdeutsch@gmail.com"
+#   },
+#   "teacher": {
+#     "_id": "677e5992cc047516b454a80a",
+#     "firstName": "Hayim",
+#     "lastName": "Deutsch",
+#     "email": "chayimdeutsch@gmail.com",
+#     "phone": "123-456-7890",
+#     "googleId": "113882388930598865430"
+#   },
+#   "questionnaire": {
+#     "_id": "6788140d48cdc2d7176801e0",
+#     "title": "Sample Questionnaire",
+#     "questions": [
+#       {
+#         "question": "What is your name?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       },
+#       {
+#         "question": "What is your age?",
+#         "hasRange": true,
+#         "hasSentence": false
+#       },
+#       {
+#         "question": "What is your favorite color?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       },
+#       {
+#         "question": "What is your favorite food?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       }
+#     ],
+#     "__v": 0
+#   },
+#   "meeting": null,
+#   "submitted": false,
+#   "__v": 0
+# }
+
+###
+### Delete Hayim Student's Follow-Up By ID
+DELETE http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/6788bf86145c1114f3124120
+
+# Response
+# HTTP/1.1 204 No Content
+
+###
+### Delete Invalid Student's Follow-Up By  correct ID
+DELETE http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b594/followups/6788bf86145c1114f3124120
+
+# Response
+# HTTP/1.1 404 Not Found
+# {
+#   "message": "Student not found"
+# }
+
+###
+### Get Hayim Student's Follow-Up By Token
+GET http://localhost:3000/api/v1/students/followups/af464023fd077ccd
+
+# Response
+# HTTP/1.1 200 OK
+# {
+#   "token": "af464023fd077ccd",
+#   "title": "Sample Follow-Up",
+#   "student": {
+#     "_id": "6787ff7b673d5a06e3e0b59d",
+#     "firstName": "Hayim",
+#     "lastName": "Student",
+#     "email": "chayimdeutsch@gmail.com"
+#   },
+#   "questionnaire": {
+#     "_id": "67880254309a18161a49091d",
+#     "title": "Sample Questionnaire",
+#     "questions": [
+#       {
+#         "question": "What is your name?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       },
+#       {
+#         "question": "What is your age?",
+#         "hasRange": true,
+#         "hasSentence": false
+#       }
+#     ],
+#     "__v": 0
+#   },
+#   "meeting": {
+#     "_id": "67880254309a18161a490919",
+#     "topic": "Math Tutoring",
+#     "duration": 60,
+#     "timeSlots": [
+#       {
+#         "startTime": "2023-10-01T10:00:00.000Z",
+#         "endTime": "2023-10-01T11:00:00.000Z",
+#         "_id": "6788bdf41233c971ec540b2a"
+#       },
+#       {
+#         "startTime": "2023-10-02T14:00:00.000Z",
+#         "endTime": "2023-10-02T15:00:00.000Z",
+#         "_id": "6788bdf41233c971ec540b2b"
+#       },
+#       {
+#         "startTime": "2023-10-03T14:00:00.000Z",
+#         "endTime": "2023-10-03T15:00:00.000Z",
+#         "_id": "6788bdf41233c971ec540b2c"
+#       }
+#     ],
+#     "status": "awaiting_selection",
+#     "__v": 0
+#   }
+# }
+
+###
+### Get Follow-Up By Invalid Token
+GET http://localhost:3000/api/v1/students/followups/1234567
+
+# Response
+# HTTP/1.1 404 Not Found
+# {
+#   "message": "FollowUp not found"
+# }
+
+###
+### Get Already submitted followup
+GET http://localhost:3000/api/v1/students/followups/356730bd9c30c046
+
+# Response
+# HTTP/1.1 409 Conflict
+# {
+#   "message": "FollowUp already submitted"
+# }
+
+###
+### Get Meeting Follow-Up By Token
+GET http://localhost:3000/api/v1/students/followups/efeeab9572d630a8
+
+# Response
+# HTTP/1.1 200 OK
+# {
+#   "token": "efeeab9572d630a8",
+#   "title": "Follow-Up Meeting",
+#   "student": {
+#     "_id": "6787ff7b673d5a06e3e0b59d",
+#     "firstName": "Hayim",
+#     "lastName": "Student",
+#     "email": "chayimdeutsch@gmail.com"
+#   },
+#   "questionnaire": null,
+#   "meeting": {
+#     "_id": "6788148f48cdc2d7176801ed",
+#     "topic": "Math Tutoring",
+#     "duration": 60,
+#     "timeSlots": [
+#       {
+#         "startTime": "2023-10-01T10:00:00.000Z",
+#         "endTime": "2023-10-01T11:00:00.000Z",
+#         "_id": "6788be031233c971ec540b43"
+#       }
+#     ],
+#     "status": "awaiting_selection",
+#     "__v": 0
+#   }
+# }
+
+###
+### Get Questionnaire Follow-Up By Token
+GET http://localhost:3000/api/v1/students/followups/88d975cbb0308960
+
+# Response
+# HTTP/1.1 200 OK
+# {
+#   "token": "88d975cbb0308960",
+#   "title": "Sample Follow-Up",
+#   "student": {
+#     "_id": "6787ff7b673d5a06e3e0b59d",
+#     "firstName": "Hayim",
+#     "lastName": "Student",
+#     "email": "chayimdeutsch@gmail.com"
+#   },
+#   "questionnaire": {
+#     "_id": "6788140d48cdc2d7176801e0",
+#     "title": "Sample Questionnaire",
+#     "questions": [
+#       {
+#         "question": "What is your name?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       },
+#       {
+#         "question": "What is your age?",
+#         "hasRange": true,
+#         "hasSentence": false
+#       },
+#       {
+#         "question": "What is your favorite color?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       },
+#       {
+#         "question": "What is your favorite food?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       }
+#     ],
+#     "__v": 0
+#   },
+#   "meeting": null
+# }
+
+###
+### Submit Follow-Up By Token
+POST http://localhost:3000/api/v1/students/followups/af464023fd077ccd/submit
+Content-Type: application/json
+
+{
   "questions": [
     {
       "question": "What is your name?",
       "hasRange": false,
       "hasSentence": true,
-      "studentAnswer": "John Doe"
-    }
-  ]
-}
-###
-### Submit Follow-Up with only Questionnaire
-PUT http://localhost:3000/api/v1/followups/7654321
-Content-Type: application/json
-
-{
-  "subject": "Follow-Up Meeting",
-  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire. <a href='http://localhost:5173/followup/7654321' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
-  "questions": [
+      "sentenceAnswer": "Hayim"
+    },
     {
-      "question": "What is your name?",
+      "question": "What is your age?",
       "hasRange": false,
       "hasSentence": true,
-      "studentAnswer": "John Doe"
+      "sentenceAnswer": 25
     }
-  ]
-}
-###
-### Submit Follow-Up with only Meeting by token
-PUT http://localhost:3000/api/v1/followups/987654321
-Content-Type: application/json
-
-{
-  "subject": "Follow-Up Meeting",
-  "emailText": "<html><body>Thank you for your time. Please select a time slot for our meeting. <a href='http://localhost:5173/followup/987654321' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
+  ],
   "selectedTimeSlot": {
     "startTime": "2023-10-01T10:00:00Z",
     "endTime": "2023-10-01T11:00:00Z"
   }
 }
+
+# Response
+# HTTP/1.1 200 OK
+# {
+#   "_id": "67880254309a18161a490920",
+#   "token": "af464023fd077ccd",
+#   "title": "Sample Follow-Up",
+#   "student": {
+#     "_id": "6787ff7b673d5a06e3e0b59d",
+#     "firstName": "Hayim",
+#     "lastName": "Student",
+#     "email": "chayimdeutsch@gmail.com"
+#   },
+#   "teacher": {
+#     "_id": "677e5992cc047516b454a80a",
+#     "firstName": "Hayim",
+#     "lastName": "Deutsch",
+#     "email": "chayimdeutsch@gmail.com",
+#     "phone": "123-456-7890",
+#     "googleId": "113882388930598865430"
+#   },
+#   "questionnaire": {
+#     "_id": "67880254309a18161a49091d",
+#     "title": "Sample Questionnaire",
+#     "questions": [
+#       {
+#         "question": "What is your name?",
+#         "hasRange": false,
+#         "hasSentence": true,
+#         "sentenceAnswer": "Hayim"
+#       },
+#       {
+#         "question": "What is your age?",
+#         "hasRange": false,
+#         "hasSentence": true,
+#         "sentenceAnswer": "25"
+#       }
+#     ],
+#     "__v": 0
+#   },
+#   "meeting": {
+#     "selectedTimeSlot": {
+#       "startTime": "2023-10-01T10:00:00.000Z",
+#       "endTime": "2023-10-01T11:00:00.000Z"
+#     },
+#     "_id": "67880254309a18161a490919",
+#     "topic": "Math Tutoring",
+#     "duration": 60,
+#     "timeSlots": [
+#       {
+#         "startTime": "2023-10-01T10:00:00.000Z",
+#         "endTime": "2023-10-01T11:00:00.000Z",
+#         "_id": "6788bdf41233c971ec540b2a"
+#       },
+#       {
+#         "startTime": "2023-10-02T14:00:00.000Z",
+#         "endTime": "2023-10-02T15:00:00.000Z",
+#         "_id": "6788bdf41233c971ec540b2b"
+#       },
+#       {
+#         "startTime": "2023-10-03T14:00:00.000Z",
+#         "endTime": "2023-10-03T15:00:00.000Z",
+#         "_id": "6788bdf41233c971ec540b2c"
+#       }
+#     ],
+#     "status": "confirmed",
+#     "__v": 0,
+#     "googleEventId": "mockEventId"
+#   },
+#   "submitted": true,
+#   "__v": 0,
+#   "submittedAt": "2025-01-16T08:48:37.727Z"
+# }
+
 ###
-### Submit Follow-Up with invalid token by token
-PUT http://localhost:3000/api/v1/followups/invalidtoken
+### Submit Follow-Up By Token with Only Questionnaire and a range question
+POST http://localhost:3000/api/v1/students/followups/1ee8c370cd53dd44/submit
 Content-Type: application/json
 
 {
-  "subject": "Follow-Up Meeting",
-  "emailText": "<html><body>Thank you for your time. Please fill out the questionnaire and select a time slot for our meeting. <a href='http://localhost:5173/followup/1234567' target='_blank'>Click here</a> to access the follow-up form.</body></html>",
-  "selectedTimeSlot": {
-    "startTime": "2023-10-01T10:00:00Z",
-    "endTime": "2023-10-01T11:00:00Z"
-  },
   "questions": [
     {
       "question": "What is your name?",
-      "hasRange": false,
+      "hasRange": true,
       "hasSentence": true,
-      "studentAnswer": "John Doe"
+      "range": {
+        "min": 0,
+        "max": 10,
+        "studentAnswer": 5
+      },
+      "sentenceAnswer": "Hayim"
     }
   ]
 }
+
+# Response
+# HTTP/1.1 200 OK
+# {
+#   "_id": "6788c98ea652e37745628605",
+#   "token": "1ee8c370cd53dd44",
+#   "title": "Followup with only Questionnaire and a range questions",
+#   "student": {
+#     "_id": "6787ff7b673d5a06e3e0b59d",
+#     "firstName": "Hayim",
+#     "lastName": "Student",
+#     "email": "chayimdeutsch@gmail.com"
+#   },
+#   "teacher": {
+#     "_id": "677e5992cc047516b454a80a",
+#     "firstName": "Hayim",
+#     "lastName": "Deutsch",
+#     "email": "chayimdeutsch@gmail.com",
+#     "phone": "123-456-7890",
+#     "googleId": "113882388930598865430"
+#   },
+#   "questionnaire": {
+#     "_id": "6788c98ea652e37745628602",
+#     "title": "Sample Questionnaire",
+#     "questions": [
+#       {
+#         "range": {
+#           "min": 0,
+#           "max": 10,
+#           "studentAnswer": 5
+#         },
+#         "question": "What is your name?",
+#         "hasRange": true,
+#         "hasSentence": true,
+#         "sentenceAnswer": "Hayim"
+#       }
+#     ],
+#     "__v": 0
+#   },
+#   "meeting": null,
+#   "submitted": true,
+#   "__v": 0,
+#   "submittedAt": "2025-01-16T09:04:55.945Z"
+# }
+
 ###
+### Submit Follow-Up By Token with Only Meeting
+POST http://localhost:3000/api/v1/students/followups/12760bd924c141cc/submit
+Content-Type: application/json
+
+{
+  "selectedTimeSlot": {
+    "startTime": "2023-10-01T10:00:00Z",
+    "endTime": "2023-10-01T11:00:00Z"
+  }
+}
+
+# Response
+# HTTP/1.1 200 OK
+# {
+#   "_id": "6788cc437996b9cd7bc67494",
+#   "token": "12760bd924c141cc",
+#   "title": "Follow-Up Meeting for submission",
+#   "student": {
+#     "_id": "6787ff7b673d5a06e3e0b59d",
+#     "firstName": "Hayim",
+#     "lastName": "Student",
+#     "email": "chayimdeutsch@gmail.com"
+#   },
+#   "teacher": {
+#     "_id": "677e5992cc047516b454a80a",
+#     "firstName": "Hayim",
+#     "lastName": "Deutsch",
+#     "email": "chayimdeutsch@gmail.com",
+#     "phone": "123-456-7890",
+#     "googleId": "113882388930598865430"
+#   },
+#   "questionnaire": null,
+#   "meeting": {
+#     "selectedTimeSlot": {
+#       "startTime": "2023-10-01T10:00:00.000Z",
+#       "endTime": "2023-10-01T11:00:00.000Z"
+#     },
+#     "_id": "6788cc437996b9cd7bc6748f",
+#     "topic": "Math Tutoring",
+#     "duration": 60,
+#     "timeSlots": [
+#       {
+#         "startTime": "2023-10-01T10:00:00.000Z",
+#         "endTime": "2023-10-01T11:00:00.000Z",
+#         "_id": "6788cc437996b9cd7bc67490"
+#       },
+#       {
+#         "startTime": "2023-10-02T14:00:00.000Z",
+#         "endTime": "2023-10-02T15:00:00.000Z",
+#         "_id": "6788cc437996b9cd7bc67491"
+#       }
+#     ],
+#     "status": "confirmed",
+#     "__v": 0,
+#     "googleEventId": "mockEventId"
+#   },
+#   "submitted": true,
+#   "__v": 0,
+#   "submittedAt": "2025-01-16T09:08:15.492Z"
+# }
+
 ###
+### Test get followup by token  after authentication switch
+GET http://localhost:3000/api/v1/students/followups/efeeab9572d630a8

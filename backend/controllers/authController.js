@@ -2,14 +2,15 @@ import passport from "../config/passportConfig.js";
 import CustomError from "../utils/CustomError.js";
 import * as dbService from "../services/dbService.js";
 import googleConfig from "../config/googleConfig.js";
+import validateHasFields from "../utils/validateHasFields.js";
+
+// Tested routes that could be tested without changing redirect using mockAuthenticated
 
 const checkApprovalStatus = async (req, res, next) => {
   try {
-    const { gmail } = req.body;
-    if (!gmail) {
-      throw new CustomError("Gmail is required", 400);
-    }
-    const isApproved = await dbService.isUserApproved(gmail);
+    const { email } = req.body;
+    validateHasFields(req.body, ["email"]);
+    const isApproved = await dbService.isUserApproved(email);
     if (!isApproved) {
       throw new CustomError("User not yet approved", 401);
     }

@@ -1,5 +1,5 @@
 ### - Create a template - should succeed on first attempt, fail on second attempt
-POST http://localhost:3000/templates
+POST http://localhost:3000/api/v1/templates
 Content-Type: application/json
 
 {
@@ -28,9 +28,14 @@ Content-Type: application/json
   ]
 }
 
+# Response:
+# {
+#   "message": "Template created successfully"
+# }
+
 ###
 ### template with different title - should succeed on first attempt, fail on second attempt
-POST http://localhost:3000/templates
+POST http://localhost:3000/api/v1/templates
 Content-Type: application/json
 
 {
@@ -45,9 +50,36 @@ Content-Type: application/json
   ]
 }
 
+# Response:
+# {
+#   "message": "Template created successfully"
+# }
+
+###
+### template with same title as first template - should fail
+POST http://localhost:3000/api/v1/templates
+Content-Type: application/json
+
+{
+  "title": "First Template",
+  "description": "This is the second template with the same name as the first template",
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": true
+    }
+  ]
+}
+
+# Response:
+# {
+#   "message": "Template title already exists"
+# }
+
 ###
 ### template with no valid question type - should fail
-POST http://localhost:3000/templates
+POST http://localhost:3000/api/v1/templates
 Content-Type: application/json
 
 {
@@ -62,9 +94,14 @@ Content-Type: application/json
   ]
 }
 
+# Response:
+# {
+#   "message": "Validation Error"
+# }
+
 ###
 ### template with no questions - should fail
-POST http://localhost:3000/templates
+POST http://localhost:3000/api/v1/templates
 Content-Type: application/json
 
 {
@@ -72,9 +109,14 @@ Content-Type: application/json
   "description": "This is the second template"
 }
 
+# Response:
+# {
+#   "message": "Missing required fields"
+# }
+
 ###
 ### template with no title - should fail
-POST http://localhost:3000/templates
+POST http://localhost:3000/api/v1/templates
 Content-Type: application/json
 
 {
@@ -88,9 +130,14 @@ Content-Type: application/json
   ]
 }
 
+# Response:
+# {
+#   "message": "Missing required fields"
+# }
+
 ###
 ### template with no description - should fail
-POST http://localhost:3000/templates
+POST http://localhost:3000/api/v1/templates
 Content-Type: application/json
 
 {
@@ -104,13 +151,101 @@ Content-Type: application/json
   ]
 }
 
+# Response:
+# {
+#   "message": "Missing required fields"
+# }
+
+###
+### get all templates - should succeed
+GET http://localhost:3000/api/v1/templates
+
+# Response:
+# [
+#   {
+#     "_id": "6787a07f37f2917d08283000",
+#     "title": "First Template",
+#     "description": "This is the first template",
+#     "questions": [
+#       {
+#         "question": "What is your name?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       },
+#       {
+#         "question": "What is your birthday?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       },
+#       {
+#         "range": {
+#           "min": 1,
+#           "max": 10
+#         },
+#         "question": "From 1-10, how happy are you?",
+#         "hasRange": true,
+#         "hasSentence": false
+#       }
+#     ],
+#     "__v": 0
+#   },
+#   {
+#     "_id": "6787a0ad37f2917d08283002",
+#     "title": "Second Template",
+#     "description": "This is the second template",
+#     "questions": [
+#       {
+#         "question": "What is your name?",
+#         "hasRange": false,
+#         "hasSentence": true
+#       }
+#     ],
+#     "__v": 0
+#   }
+# ]
+
+###
+### get a template by title - should succeed
+GET http://localhost:3000/api/v1/templates/First%20Template
+
+# Response:
+# [
+#   {
+#     "question": "What is your name?",
+#     "hasRange": false,
+#     "hasSentence": true
+#   },
+#   {
+#     "question": "What is your birthday?",
+#     "hasRange": false,
+#     "hasSentence": true
+#   },
+#   {
+#     "range": {
+#       "min": 1,
+#       "max": 10
+#     },
+#     "question": "From 1-10, how happy are you?",
+#     "hasRange": true,
+#     "hasSentence": false
+#   }
+# ]
+
+###
+### get a template by title that does not exist - should fail
+GET http://localhost:3000/api/v1/templates/Nonexistent%20Template
+
+# Response:
+# HTTP/1.1 404 Not Found
+# {
+#   "message": "Template not found"
+# }
 ###
 ### update a template - should succeed on first attempt
-PUT http://localhost:3000/templates/First%20Template
+PUT http://localhost:3000/api/v1/templates/First%20Template
 Content-Type: application/json
 
 {
-  "title": "First Template",
   "description": "This is the first template",
   "questions": [
     {
@@ -140,7 +275,90 @@ Content-Type: application/json
   ]
 }
 
+# Response:
+# {
+#   "_id": "6787a07f37f2917d08283000",
+#   "title": "First Template",
+#   "description": "This is the first template",
+#   "questions": [
+#     {
+#       "question": "What is your name?",
+#       "hasRange": false,
+#       "hasSentence": true
+#     },
+#     {
+#       "question": "What is your birthday?",
+#       "hasRange": false,
+#       "hasSentence": true
+#     },
+#     {
+#       "range": {
+#         "min": 1,
+#         "max": 10
+#       },
+#       "question": "From 1-10, how happy are you?",
+#       "hasRange": true,
+#       "hasSentence": false
+#     },
+#     {
+#       "question": "What is your favorite color?",
+#       "hasRange": false,
+#       "hasSentence": true
+#     }
+#   ],
+#   "__v": 0
+# }
+
+###
+### update a template with no questions - should fail
+PUT http://localhost:3000/api/v1/templates/First%20Template
+Content-Type: application/json
+
+{
+  "description": "This is the first template"
+}
+
+# Response:
+# {
+#   "message": "Missing required fields"
+# }
+
+###
+### update a template with no description - should fail
+PUT http://localhost:3000/api/v1/templates/First%20Template
+Content-Type: application/json
+
+{
+  "questions": [
+    {
+      "question": "What is your name?",
+      "hasRange": false,
+      "hasSentence": true
+    }
+  ]
+}
+
+# Response:
+# {
+#   "message": "Missing required fields"
+# }
+
 ###
 ### delete a template - should succeed on first attempt
-DELETE http://localhost:3000/templates/Second%20Template
-```
+DELETE http://localhost:3000/api/v1/templates/Second%20Template
+
+# Response:
+# HTTP/1.1 204 No Content
+
+###
+### delete a template that does not exist - should fail
+DELETE http://localhost:3000/api/v1/templates/Nonexistent%20Template
+
+# Response:
+# HTTP/1.1 404 Not Found
+# {
+#   "message": "Template not found"
+# }
+
+###
+

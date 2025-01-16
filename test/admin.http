@@ -3,8 +3,27 @@ POST http://localhost:3000/api/v1/admin/check-admin
 Content-Type: application/json
 
 {
-  "gmail": "core.torah.followup@gmail.com"
+  "email": "core.torah.followup@gmail.com"
 }
+
+# Response
+# { 
+#   "message": "Admin approved"
+# }
+
+###
+### Check Admin without email
+POST http://localhost:3000/api/v1/admin/check-admin
+Content-Type: application/json
+
+{
+}
+
+# Response
+# HTTP/1.1 400 Bad Request
+# {
+#  "message": "Missing required fields: [email]"
+# }
 
 ###
 ### Check Admin Hayim
@@ -12,26 +31,158 @@ POST http://localhost:3000/api/v1/admin/check-admin
 Content-Type: application/json
 
 {
-  "gmail": "chayimdeutsch@gmail.com"
+  "email": "chayimdeutsch@gmail.com"
 }
+
+# Response
+# HTTP/1.1 403 Forbidden
+# {
+#   "message": "Forbidden"
+# }
 
 ###
 ### Get Pending Users
 GET http://localhost:3000/api/v1/admin/users/pending
 
+# Response
+# [
+#   {
+#     "_id": "6787a7795659cd7edb62ac0f",
+#     "firstName": "Core",
+#     "lastName": "Torah",
+#     "email": "core.torah.followup@gmail.com",
+#     "approved": false,
+#     "phone": "123-456-7890",
+#     "students": [],
+#     "__v": 0
+#   },
+#   {
+#     "_id": "6787a7845659cd7edb62ac11",
+#     "firstName": "Unapproved",
+#     "lastName": "User1",
+#     "email": "unapprovedUser1@gmail.com",
+#     "approved": false,
+#     "phone": "123-456-7890",
+#     "students": [],
+#     "__v": 0
+#   },
+# ]
+
 ###
 ### Get Approved Users
 GET http://localhost:3000/api/v1/admin/users/approved
 
+# Response
+# [
+#   {
+#     "googleTokens": {
+#       "accessToken": "ya29.a0ARW5m76w3cCK7qn5kgkckTsw3Yo49mQ1cLqI7VmNoPOYi9Su7oJ4tpuT1GNcdUsdBNJDiD81DY3qRoV5etR-r2OI26pH-PIKbW7Vymf5c6eLUe8S7-8rISWXRn6BkL6kw4SsN9Ps62V3JEv0BebE1qW6rudq-piVE7fgDS2rbgaCgYKAUcSARISFQHGX2MibAhrqhowTh7LbmRhNWeiig0177",
+#       "refreshToken": "1//03q-28_l4R-aeCgYIARAAGAMSNwF-L9IrdD9JsJxWVIKx9CKeyhEXiVlzKFqTFJHxchto6wRCWPlCoe3f2nYIDDgaEoMFMGoCIUQ"
+#     },
+#     "_id": "677e5992cc047516b454a80a",
+#     "firstName": "Hayim",
+#     "lastName": "Deutsch",
+#     "email": "chayimdeutsch@gmail.com",
+#     "approved": true,
+#     "phone": "123-456-7890",
+#     "students": [],
+#     "__v": 15,
+#     "googleId": "113882388930598865430"
+#   }
+# ]
+
 ###
-### Approve User - chayimdeutsch@gmail.com
-POST http://localhost:3000/api/v1/admin/users/chayimdeutsch@gmail.com/approve
+### Approve already approved User - Hayim Deutsch
+POST http://localhost:3000/api/v1/admin/users/677e5992cc047516b454a80a/approve
+
+# Response
+# {
+#   "message": "User approved successfully"
+# }
 
 ###
 ### Approve User - unapprovedUser2@gmail
-POST http://localhost:3000/api/v1/admin/users/unapprovedUser2@gmail/approve
+POST http://localhost:3000/api/v1/admin/users/6787a79e5659cd7edb62ac13/approve
+
+# Response
+# {
+#   "message": "User approved successfully"
+# }
 
 ###
-
 ### Delete User - First User
-DELETE http://localhost:3000/api/v1/admin/users/unapprovedUser1@gmail.com
+DELETE http://localhost:3000/api/v1/admin/users/6787a7845659cd7edb62ac11
+
+# Response
+# HTTP/1.1 204 No Contentd
+
+###
+### Delete User - Non-existent User
+DELETE http://localhost:3000/api/v1/admin/users/6787a7845659cd7edb62ac12
+
+# Response
+# HTTP/1.1 404 Not Found
+# {
+#   "message": "User not found"
+# }
+
+###
+### Create approved User
+POST http://localhost:3000/api/v1/admin/users/approved
+Content-Type: application/json
+
+{
+  "firstName": "Approved",
+  "lastName": "User",
+  "email": "approvedUser@gmail.com",
+  "phone": "123-456-7890"
+}
+
+# Response
+# HTTP/1.1 201 Created
+# {
+#   "firstName": "Approved",
+#   "lastName": "User",
+#   "email": "approvedUser@gmail.com",
+#   "approved": true,
+#   "phone": "123-456-7890",
+#   "students": [],
+#   "_id": "6787c27164f5e82b56aa0f44",
+#   "__v": 0
+# }
+
+###
+### Create approved user that already exists
+POST http://localhost:3000/api/v1/admin/users/approved
+Content-Type: application/json
+
+{
+  "firstName": "Approved",
+  "lastName": "User",
+  "email": "approvedUser@gmail.com",
+  "phone": "123-456-7890"
+}
+
+# Response
+# {
+#   "message": "User already exists"
+# }
+
+###
+### Create approved user with missing fields
+POST http://localhost:3000/api/v1/admin/users/approved
+Content-Type: application/json
+
+{
+  "firstName": "Approved",
+  "lastName": "User"
+}
+
+# Response
+# HTTP/1.1 400 Bad Request
+# {
+#   "message": "Missing required fields: [phone, email]"
+# }
+
+###
+###

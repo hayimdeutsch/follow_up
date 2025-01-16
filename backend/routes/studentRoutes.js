@@ -13,8 +13,10 @@ import mockAuthenticated from "../mocks/mockAuthenticated.js";
 
 const studentsRouter = express.Router();
 
-//studentsRouter.use(checkAuthenticated);
-studentsRouter.use(mockAuthenticated);
+studentsRouter.use("/followups", followUpStudentRouter);
+//All routes tested with mockAuthenticated
+studentsRouter.use(checkAuthenticated);
+// studentsRouter.use(mockAuthenticated);
 
 studentsRouter.post("/", createStudent);
 studentsRouter.get("/", getStudentsByTeacher);
@@ -24,7 +26,5 @@ studentsRouter.delete("/:studentId", deleteStudent);
 studentsRouter.put("/:studentId/emails", updateStudentEmails);
 
 studentsRouter.use("/:studentId/followups", followUpTeacherRouter);
-
-studentsRouter.use("/followups", followUpStudentRouter);
 
 export default studentsRouter;

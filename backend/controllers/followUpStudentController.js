@@ -2,6 +2,7 @@ import * as dbService from "../services/dbService.js";
 import CustomError from "../utils/CustomError.js";
 import { scheduleCalendarEvent } from "../services/calendarService.js";
 import { sendFromSystem } from "../services/emailService.js";
+import validateHasFields from "../utils/validateHasFields.js";
 
 const getFollowUp = async (req, res, next) => {
   try {
@@ -28,10 +29,6 @@ const getFollowUp = async (req, res, next) => {
 const submitFollowUp = async (req, res, next) => {
   try {
     const { token } = req.params;
-    const { questions, selectedTimeSlot } = req.body;
-    if (!questions && !selectedTimeSlot) {
-      throw new CustomError("Missing required fields", 400);
-    }
     const followUp = await dbService.getFollowUpByToken(token);
     if (!followUp) {
       throw new CustomError("FollowUp not found", 404);
@@ -39,7 +36,15 @@ const submitFollowUp = async (req, res, next) => {
     if (followUp.submitted) {
       throw new CustomError("FollowUp already submitted", 409);
     }
+    const { selectedTimeSlot, questions } = req.body;
+    if (!selectedTimeSlot && !questions) {
+      throw new CustomError(
+        "Must provide either selectedTimeSlot or questions",
+        400
+      );
+    }
     if (selectedTimeSlot) {
+      validateHasFields(selectedTimeSlot, ["startTime", "endTime"]);
       const meetingEvent = await scheduleCalendarEvent(
         followUp.teacher,
         followUp.student.firstName + " " + followUp.student.lastName,
@@ -47,6 +52,11 @@ const submitFollowUp = async (req, res, next) => {
         followUp.meeting.topic,
         selectedTimeSlot
       );
+      // const meetingEvent = {
+      //   id: "mockEventId",
+      //   start: new Date(selectedTimeSlot),
+      //   end: new Date(selectedTimeSlot),
+      // };
       await dbService.confirmMeeting(
         followUp.meeting._id,
         selectedTimeSlot,
@@ -59,9 +69,14 @@ const submitFollowUp = async (req, res, next) => {
         questions
       );
     }
+    // need to create a template for this email
     const submittedFollowUp = await dbService.submitFollowUpByToken(token);
-    await sendFromSystem(followUp.teacher.email, "FollowUp submitted", "");
-    res.status(201).json(submittedFollowUp);
+    await sendFromSystem(
+      followUp.teacher.email,
+      `${followUp.student.firstName} ${followUp.student.lastName} Follow-Up Submitted`,
+      `The follow-up for ${followUp.student.firstName} ${followUp.student.lastName} has been submitted.`
+    );
+    res.status(200).json(submittedFollowUp);
   } catch (error) {
     next(error);
   }

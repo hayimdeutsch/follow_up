@@ -1,0 +1,157 @@
+### Register Hayim Deutsch
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+
+{
+  "firstName": "Hayim",
+  "lastName": "Deutsch",
+  "phone": "123-456-7890",
+  "email": "chayimdeutsch@gmail.com"
+}
+
+###
+### Register Core
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+
+{
+  "firstName": "Core",
+  "lastName": "Torah",
+  "phone": "123-456-7890",
+  "email": "core.torah.followup@gmail.com"
+}
+
+# Response
+# {
+  # message: "Application successfully submitted"
+# }
+
+###
+### Create unapproved user 1
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+
+{
+  "firstName": "Unapproved",
+  "lastName": "User1",
+  "phone": "123-456-7890",
+  "email": "unapprovedUser1@gmail.com"
+}
+
+# Response
+# {
+  # message: "Application successfully submitted"
+# }
+
+###
+### Create unapproved user 2
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+
+{
+  "firstName": "Unapproved",
+  "lastName": "User2",
+  "phone": "123-456-7890",
+  "email": "unapprovedUser2@gmail.com"
+}
+
+# Response
+# {
+  # message: "Application successfully submitted"
+# }
+
+###
+### Create user with no gmail
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+
+{
+  "firstName": "No",
+  "lastName": "Gmail",
+  "phone": "123-456-7890",
+  "email": "unapproved@notgmail.com"
+}
+
+# Response
+# {
+#   "message": "Only gmail accounts are allowed"
+# }
+
+###
+### Create user with no first name
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+
+{
+  "lastName": "No",
+  "phone": "123-456-7890",
+  "email": "nofirstname@gmail.com"
+}
+
+# Response
+# {
+#   "message": "Missing required fields: [firstName]"
+# }
+
+###
+### Create user with no last name
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+
+{
+  "firstName": "No",
+  "phone": "123-456-7890",
+  "email": "nolastname@gmail.com"
+}
+
+# Response
+# {
+#   "message": "Missing required fields: [lastName]"
+# }
+
+###
+### Create user with no phone
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+
+{
+  "firstName": "No",
+  "lastName": "Phone",
+  "email": "nophone@gmail.com"
+}
+
+# Response
+# {
+#   "message": "All fields are required"
+# }
+
+###
+### Create user with no email
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+
+{
+  "firstName": "No",
+  "lastName": "Email",
+  "phone": "123-456-7890"
+}
+
+# Response
+# {
+#   "message": "Missing required fields: [email]"
+# }
+
+###
+### Create user with no fields
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+
+{}
+
+# Response
+# {
+#   "message": "Missing required fields: [firstName, lastName, email, phone]"
+# }
+
+###
+### 

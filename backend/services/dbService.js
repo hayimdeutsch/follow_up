@@ -7,8 +7,8 @@ import Student from "../models/Student.js";
 import Meeting from "../models/Meeting.js";
 import FollowUp from "../models/FollowUp.js";
 
-const createUser = async (firstName, lastName, gmail, phone) => {
-  const newUser = new Teacher({ firstName, lastName, email: gmail, phone });
+const createUser = async (firstName, lastName, email, phone) => {
+  const newUser = new Teacher({ firstName, lastName, email, phone });
   try {
     await newUser.validate();
   } catch (error) {
@@ -22,11 +22,11 @@ const createUser = async (firstName, lastName, gmail, phone) => {
   }
 };
 
-const createApprovedUser = async ({ firstName, lastName, gmail, phone }) => {
+const createApprovedUser = async ({ firstName, lastName, email, phone }) => {
   const newUser = new Teacher({
     firstName,
     lastName,
-    email: gmail,
+    email,
     phone,
     approved: true,
   });
@@ -41,7 +41,11 @@ const createApprovedUser = async ({ firstName, lastName, gmail, phone }) => {
     await newUser.save();
     return newUser;
   } catch (error) {
-    throw new CustomError("DB Error", 500, error);
+    if (error.code === 11000) {
+      throw new CustomError("User already exists", 409);
+    } else {
+      throw new CustomError("DB Error", 500, error);
+    }
   }
 };
 
@@ -203,22 +207,21 @@ const deleteTemplateByTitle = async (title) => {
   }
 };
 
-const addStudent = async (
-  teacherId,
+const createStudent = async ({
+  teacher,
   firstName,
   lastName,
   email,
   eventDate,
-  followUpEmails
-) => {
-  console.log("followUpEmails: ", followUpEmails);
+  scheduledEmails,
+}) => {
   const newStudent = new Student({
-    teacher: teacherId,
+    teacher,
     firstName,
     lastName,
     email,
     eventDate,
-    scheduledEmails: followUpEmails,
+    scheduledEmails,
   });
 
   try {
@@ -229,7 +232,7 @@ const addStudent = async (
 
   try {
     await newStudent.save();
-    await addStudentToTeacher(teacherId, newStudent);
+    await addStudentToTeacher(teacher, newStudent);
     return newStudent;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
@@ -239,8 +242,11 @@ const addStudent = async (
 const getStudentById = async (studentId) => {
   try {
     const student = await Student.findById(studentId).populate([
-      "followUps",
-      "teacher",
+      { path: "followUps" },
+      {
+        path: "teacher",
+        select: "firstName lastName email phone _id",
+      },
     ]);
     return student;
   } catch (error) {
@@ -569,7 +575,7 @@ export {
   getTemplateByTitle,
   updateTemplateByTitle,
   deleteTemplateByTitle,
-  addStudent,
+  createStudent,
   getStudentsbyGoogleId,
   getStudentById,
   deleteStudentById,

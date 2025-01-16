@@ -2,6 +2,8 @@ import * as dbService from "../services/dbService.js";
 import CustomError from "../utils/CustomError.js";
 import { sendFromTeacher } from "../services/emailService.js";
 import generateToken from "../utils/generateToken.js";
+import validateHasFields from "../utils/validateHasFields.js";
+import { request } from "express";
 
 const getStudentFollowUps = async (req, res, next) => {
   try {
@@ -18,26 +20,20 @@ const getStudentFollowUps = async (req, res, next) => {
 
 const createFollowUp = async (req, res, next) => {
   try {
+    validateFollowUpFields(req.body);
     const { title, options, emailText, questionnaire, meeting } = req.body;
-    const { studentId } = req.params;
 
-    const teacher = await dbService.getTeacherByGoogleId(req.user.googleId);
+    const { studentId } = req.params;
     const student = await dbService.getStudentById(studentId);
     if (!student) {
       throw new CustomError("Student not found", 404);
     }
-    if (
-      !title ||
-      !emailText ||
-      !(options?.isQuestionnaire || options?.isMeeting) ||
-      (options?.isQuestionnaire && !questionnaire) ||
-      (options?.isMeeting && !meeting)
-    ) {
-      throw new CustomError("Missing required fields", 400);
-    }
+
+    const teacher = await dbService.getTeacherByGoogleId(req.user.googleId);
 
     let meetingId = null;
     let questionnaireId = null;
+
     if (options.isMeeting) {
       const newMeeting = await dbService.createMeeting(meeting);
       meetingId = newMeeting._id;
@@ -90,11 +86,16 @@ const getFollowUp = async (req, res, next) => {
 
 const updateFollowUp = async (req, res, next) => {
   try {
-    const { followupId } = req.params;
+    const { studentId, followupId } = req.params;
     const { questionnaire, meeting } = req.body;
 
-    if (!questionnaire && !meeting) {
+    if (!(questionnaire || meeting)) {
       throw new CustomError("Missing required fields", 400);
+    }
+
+    const student = await dbService.getStudentById(studentId);
+    if (!student) {
+      throw new CustomError("Student not found", 404);
     }
 
     const existingFollowUp = await dbService.getFollowUpById(followupId);
@@ -134,7 +135,11 @@ const updateFollowUp = async (req, res, next) => {
 
 const deleteFollowUp = async (req, res, next) => {
   try {
-    const { followupId } = req.params;
+    const { studentId, followupId } = req.params;
+    const student = await dbService.getStudentById(studentId);
+    if (!student) {
+      throw new CustomError("Student not found", 404);
+    }
     const followUp = await dbService.deleteFollowUpById(followupId);
     if (!followUp) {
       throw new CustomError("FollowUp not found", 404);
@@ -143,6 +148,29 @@ const deleteFollowUp = async (req, res, next) => {
     res.status(204).json({ message: "Follow up deleted" });
   } catch (error) {
     next(error);
+  }
+};
+
+const validateFollowUpFields = (reqBody) => {
+  validateHasFields(reqBody, ["title", "options", "emailText"]);
+
+  const { options, questionnaire, meeting } = reqBody;
+
+  if (!options.isQuestionnaire && !options.isMeeting) {
+    throw new CustomError(
+      "Followup must have either a questionnaire or meeting",
+      400
+    );
+  }
+
+  if (options.isQuestionnaire) {
+    validateHasFields(reqBody, ["questionnaire"]);
+    validateHasFields(questionnaire, ["title", "questions"]);
+  }
+
+  if (options.isMeeting) {
+    validateHasFields(reqBody, ["meeting"]);
+    validateHasFields(meeting, ["topic", "duration", "timeSlots"]);
   }
 };
 

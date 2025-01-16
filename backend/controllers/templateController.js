@@ -62,7 +62,10 @@ const updateTemplate = async (req, res, next) => {
 const deleteTemplate = async (req, res, next) => {
   try {
     const { title } = req.params;
-    await dbService.deleteTemplateByTitle(title);
+    const deletedTemplate = await dbService.deleteTemplateByTitle(title);
+    if (!deletedTemplate) {
+      throw new CustomError("Template not found", 404);
+    }
     res.status(204).json({ message: "Template deleted successfully" });
   } catch (error) {
     next(error);

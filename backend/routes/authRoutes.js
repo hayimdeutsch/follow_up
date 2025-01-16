@@ -1,5 +1,6 @@
 import { Router } from "express";
 import checkAuthenticated from "../middleware/checkAuthenticated.js";
+import mockAuthenticated from "../mocks/mockAuthenticated.js";
 import {
   checkApprovalStatus,
   saveRedirectToSession,
@@ -19,6 +20,7 @@ authRouter.get("/google/callback", googleAuthCallbackRedirect);
 
 authRouter.get("/logout", logout);
 
-authRouter.get("/user", checkAuthentication, getUser);
+// authRouter.get("/user", mockAuthenticated, getUser);
+authRouter.get("/user", checkAuthenticated, getUser);
 
 export default authRouter;
