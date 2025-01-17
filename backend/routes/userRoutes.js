@@ -15,6 +15,7 @@ import mockAdminCheck from "../mocks/mockAdminCheck.js";
 const userRouter = Router();
 
 //All routes tested using mockAuthenticated and mockAdminCheck
+
 userRouter.use(checkAuthenticated);
 // userRouter.use(mockAuthenticated);
 

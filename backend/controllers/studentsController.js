@@ -4,7 +4,7 @@ import validateHasFields from "../utils/validateHasFields.js";
 
 const createStudent = async (req, res, next) => {
   try {
-    const teacher = await dbService.getTeacherByGoogleId(req.user.googleId);
+    const teacher = await dbService.getTeacherById(req.user._id);
     validateHasFields(req.body, [
       "firstName",
       "lastName",
@@ -26,9 +26,7 @@ const createStudent = async (req, res, next) => {
 
 const getStudentsByTeacher = async (req, res, next) => {
   try {
-    const studentsObject = await dbService.getStudentsbyGoogleId(
-      req.user.googleId
-    );
+    const studentsObject = await dbService.getStudentsByTeacherId(req.user._id);
     res.status(200).json(studentsObject.students);
   } catch (error) {
     next(error);
@@ -72,7 +70,7 @@ const deleteStudent = async (req, res, next) => {
     if (!deletedStudent) {
       throw new CustomError("Student not found", 404);
     }
-    res.status(204);
+    res.status(204).end();
   } catch (error) {
     next(error);
   }

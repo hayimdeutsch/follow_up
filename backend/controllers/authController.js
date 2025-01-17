@@ -10,6 +10,10 @@ const checkApprovalStatus = async (req, res, next) => {
   try {
     const { email } = req.body;
     validateHasFields(req.body, ["email"]);
+    const user = await dbService.getTeacherByGmail(email);
+    if (!user) {
+      throw new CustomError("User not found", 404);
+    }
     const isApproved = await dbService.isUserApproved(email);
     if (!isApproved) {
       throw new CustomError("User not yet approved", 401);

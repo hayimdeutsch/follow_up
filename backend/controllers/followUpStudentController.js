@@ -45,18 +45,18 @@ const submitFollowUp = async (req, res, next) => {
     }
     if (selectedTimeSlot) {
       validateHasFields(selectedTimeSlot, ["startTime", "endTime"]);
-      const meetingEvent = await scheduleCalendarEvent(
-        followUp.teacher,
-        followUp.student.firstName + " " + followUp.student.lastName,
-        followUp.student.email,
-        followUp.meeting.topic,
-        selectedTimeSlot
-      );
-      // const meetingEvent = {
-      //   id: "mockEventId",
-      //   start: new Date(selectedTimeSlot),
-      //   end: new Date(selectedTimeSlot),
-      // };
+      // const meetingEvent = await scheduleCalendarEvent(
+      //   followUp.teacher,
+      //   followUp.student.firstName + " " + followUp.student.lastName,
+      //   followUp.student.email,
+      //   followUp.meeting.topic,
+      //   selectedTimeSlot
+      // );
+      const meetingEvent = {
+        id: "mockEventId",
+        start: new Date(selectedTimeSlot),
+        end: new Date(selectedTimeSlot),
+      };
       await dbService.confirmMeeting(
         followUp.meeting._id,
         selectedTimeSlot,
