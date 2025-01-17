@@ -1,5 +1,5 @@
 ### Get First Student Follow-Ups
-GET http://localhost:3000/api/v1/students/6787ff73673d5a06e3e0b595/followups
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896526dbfd25f355091bcf/followups
 
 # Response
 # HTTP/1.1 200 OK
@@ -7,7 +7,7 @@ GET http://localhost:3000/api/v1/students/6787ff73673d5a06e3e0b595/followups
 
 ###
 ### Get Hayim Student Follow-Ups
-GET http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups
 
 # Response
 # HTTP/1.1 200 OK
@@ -49,7 +49,7 @@ GET http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
 
 ###
 ### Create a Follow-Up for Hayim Student
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups
 Content-Type: application/json
 
 {
@@ -102,7 +102,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request with only Questionnaire
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups
 Content-Type: application/json
 
 {
@@ -142,7 +142,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request with Questionnaire that has a range question
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups
 Content-Type: application/json
 
 {
@@ -185,7 +185,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request with only Meeting
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups
 Content-Type: application/json
 
 {
@@ -229,7 +229,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request with only Meeting for submission
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups
 Content-Type: application/json
 
 {
@@ -273,7 +273,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request with no Questionnaire or Meeting
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
 Content-Type: application/json
 
 {
@@ -293,7 +293,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request without Title
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
 Content-Type: application/json
 
 {
@@ -337,7 +337,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request without Email Text
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
 Content-Type: application/json
 
 {
@@ -380,8 +380,8 @@ Content-Type: application/json
 # }
 
 ###
-### Follow-Up Request without empty body
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+### Follow-Up Request with empty body
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
 Content-Type: application/json
 
 {}
@@ -394,7 +394,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request with options.meeting and no meeting object
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
 Content-Type: application/json
 
 {
@@ -415,7 +415,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request with invalid student ID
-POST http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b594/followups
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/6787ff7b673d5a06e3e0b594/followups
 Content-Type: application/json
 
 {
@@ -460,7 +460,7 @@ Content-Type: application/json
 
 ###
 ### Get Follow-Up By ID
-GET http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/67880254309a18161a490920
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups/678972b360aaed784bf56c6c
 
 # Response
 # HTTP/1.1 200 OK
@@ -519,7 +519,7 @@ GET http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/678
 
 ###
 ### Update Hayim Student's Follow-Up By ID
-PUT http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/67880254309a18161a490920
+PUT http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups/6789723260aaed784bf56c2c
 Content-Type: application/json
 
 {
@@ -626,7 +626,7 @@ Content-Type: application/json
 
 ###
 ### Update Hayim Student's Follow-Up just meeting
-PUT http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/6788148f48cdc2d7176801f2
+PUT http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups/6789728660aaed784bf56c59
 Content-Type: application/json
 
 {
@@ -684,7 +684,7 @@ Content-Type: application/json
 
 ###
 ### Update Hayim Student's Follow-Up just questionnaire
-PUT http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/6788140d48cdc2d7176801e3
+PUT http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups/6789726660aaed784bf56c3d
 Content-Type: application/json
 
 {
@@ -769,14 +769,14 @@ Content-Type: application/json
 
 ###
 ### Delete Hayim Student's Follow-Up By ID
-DELETE http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b59d/followups/6788bf86145c1114f3124120
+DELETE http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups/6789726e60aaed784bf56c4a
 
 # Response
 # HTTP/1.1 204 No Content
 
 ###
 ### Delete Invalid Student's Follow-Up By  correct ID
-DELETE http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b594/followups/6788bf86145c1114f3124120
+DELETE http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups/6788bf86145c1114f3124120
 
 # Response
 # HTTP/1.1 404 Not Found
@@ -786,7 +786,7 @@ DELETE http://localhost:3000/api/v1/students/6787ff7b673d5a06e3e0b594/followups/
 
 ###
 ### Get Hayim Student's Follow-Up By Token
-GET http://localhost:3000/api/v1/students/followups/af464023fd077ccd
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/followups/82db34a9cda73214
 
 # Response
 # HTTP/1.1 200 OK
@@ -844,7 +844,7 @@ GET http://localhost:3000/api/v1/students/followups/af464023fd077ccd
 
 ###
 ### Get Follow-Up By Invalid Token
-GET http://localhost:3000/api/v1/students/followups/1234567
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/followups/1234567
 
 # Response
 # HTTP/1.1 404 Not Found
@@ -854,7 +854,7 @@ GET http://localhost:3000/api/v1/students/followups/1234567
 
 ###
 ### Get Already submitted followup
-GET http://localhost:3000/api/v1/students/followups/356730bd9c30c046
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/followups/372a055721141594
 
 # Response
 # HTTP/1.1 409 Conflict
@@ -864,7 +864,7 @@ GET http://localhost:3000/api/v1/students/followups/356730bd9c30c046
 
 ###
 ### Get Meeting Follow-Up By Token
-GET http://localhost:3000/api/v1/students/followups/efeeab9572d630a8
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/followups/aede3da19abd96c0
 
 # Response
 # HTTP/1.1 200 OK
@@ -896,7 +896,7 @@ GET http://localhost:3000/api/v1/students/followups/efeeab9572d630a8
 
 ###
 ### Get Questionnaire Follow-Up By Token
-GET http://localhost:3000/api/v1/students/followups/88d975cbb0308960
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/followups/297ddfd683973709
 
 # Response
 # HTTP/1.1 200 OK
@@ -941,7 +941,7 @@ GET http://localhost:3000/api/v1/students/followups/88d975cbb0308960
 
 ###
 ### Submit Follow-Up By Token
-POST http://localhost:3000/api/v1/students/followups/af464023fd077ccd/submit
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/followups/af464023fd077ccd/submit
 Content-Type: application/json
 
 {
@@ -1040,7 +1040,7 @@ Content-Type: application/json
 
 ###
 ### Submit Follow-Up By Token with Only Questionnaire and a range question
-POST http://localhost:3000/api/v1/students/followups/1ee8c370cd53dd44/submit
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/followups/3a72c4c926152ba2/submit
 Content-Type: application/json
 
 {
@@ -1105,7 +1105,7 @@ Content-Type: application/json
 
 ###
 ### Submit Follow-Up By Token with Only Meeting
-POST http://localhost:3000/api/v1/students/followups/12760bd924c141cc/submit
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/followups/372a055721141594/submit
 Content-Type: application/json
 
 {
@@ -1167,4 +1167,4 @@ Content-Type: application/json
 
 ###
 ### Test get followup by token  after authentication switch
-GET http://localhost:3000/api/v1/students/followups/efeeab9572d630a8
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/followups/efeeab9572d630a8

@@ -1,5 +1,5 @@
 ### Check Admin Core
-POST http://16.170.45.41:3000/api/v1/admin/check-admin
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/check-admin
 Content-Type: application/json
 
 {
@@ -13,7 +13,7 @@ Content-Type: application/json
 
 ###
 ### Check Admin without email
-POST http://16.170.45.41:3000/api/v1/admin/check-admin
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/check-admin
 Content-Type: application/json
 
 {
@@ -27,7 +27,7 @@ Content-Type: application/json
 
 ###
 ### Check Admin Hayim
-POST http://16.170.45.41:3000/api/v1/admin/check-admin
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/check-admin
 Content-Type: application/json
 
 {
@@ -42,7 +42,7 @@ Content-Type: application/json
 
 ###
 ### Get Pending Users
-GET http://16.170.45.41:3000/api/v1/admin/users/pending
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/pending
 
 # Response
 # [
@@ -70,7 +70,7 @@ GET http://16.170.45.41:3000/api/v1/admin/users/pending
 
 ###
 ### Get Approved Users
-GET http://16.170.45.41:3000/api/v1/admin/users/approved
+GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/approved
 
 # Response
 # [
@@ -93,7 +93,7 @@ GET http://16.170.45.41:3000/api/v1/admin/users/approved
 
 ###
 ### Approve already approved User - Hayim Deutsch
-POST http://16.170.45.41:3000/api/v1/admin/users/677e5992cc047516b454a80a/approve
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/6789631198083d1a3b1e13e0/approve
 
 # Response
 # {
@@ -102,7 +102,7 @@ POST http://16.170.45.41:3000/api/v1/admin/users/677e5992cc047516b454a80a/approv
 
 ###
 ### Approve User - unapprovedUser2@gmail
-POST http://16.170.45.41:3000/api/v1/admin/users/6787a79e5659cd7edb62ac13/approve
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/6789699525cbfe76a92c7bfb/approve
 
 # Response
 # {
@@ -111,14 +111,14 @@ POST http://16.170.45.41:3000/api/v1/admin/users/6787a79e5659cd7edb62ac13/approv
 
 ###
 ### Delete User - First User
-DELETE http://16.170.45.41:3000/api/v1/admin/users/6787a7845659cd7edb62ac11
+DELETE http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/6787a7845659cd7edb62ac11
 
 # Response
 # HTTP/1.1 204 No Contentd
 
 ###
 ### Delete User - Non-existent User
-DELETE http://16.170.45.41:3000/api/v1/admin/users/6787a7845659cd7edb62ac12
+DELETE http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/6787a7845659cd7edb62ac12
 
 # Response
 # HTTP/1.1 404 Not Found
@@ -128,7 +128,7 @@ DELETE http://16.170.45.41:3000/api/v1/admin/users/6787a7845659cd7edb62ac12
 
 ###
 ### Create approved User
-POST http://16.170.45.41:3000/api/v1/admin/users/approved
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/approved
 Content-Type: application/json
 
 {
@@ -153,7 +153,7 @@ Content-Type: application/json
 
 ###
 ### Create approved user that already exists
-POST http://16.170.45.41:3000/api/v1/admin/users/approved
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/approved
 Content-Type: application/json
 
 {
@@ -170,7 +170,7 @@ Content-Type: application/json
 
 ###
 ### Create approved user with missing fields
-POST http://16.170.45.41:3000/api/v1/admin/users/approved
+POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/approved
 Content-Type: application/json
 
 {
