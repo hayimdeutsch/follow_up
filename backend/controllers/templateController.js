@@ -1,18 +1,13 @@
 import * as dbService from "../services/dbService.js";
 import CustomError from "../utils/CustomError.js";
+import validateHasFields from "../utils/validateHasFields.js";
 
 const createTemplate = async (req, res, next) => {
   try {
-    const { title, description, questions } = req.body;
-    if (!title || !description || !questions) {
-      throw new CustomError("Missing required fields", 400);
-    }
-    const templateQuestionnaire = await dbService.createTemplate(
-      title,
-      description,
-      questions
-    );
-    res.status(201).json({ message: "Template created successfully" });
+    validateHasFields(req.body, ["title", "description", "questions"]);
+
+    const templateQuestionnaire = await dbService.createTemplate(req.body);
+    res.status(201).json(templateQuestionnaire);
   } catch (error) {
     next(error);
   }
@@ -43,15 +38,13 @@ const getTemplateQuestions = async (req, res, next) => {
 const updateTemplate = async (req, res, next) => {
   try {
     const { title } = req.params;
+    validateHasFields(req.body, ["questions", "description"]);
     const { questions, description } = req.body;
-    if (!questions || !description) {
-      throw new CustomError("Missing required fields", 400);
-    }
 
-    const updatedTemplate = await dbService.updateTemplateByTitle(title, {
-      questions,
-      description,
-    });
+    const updatedTemplate = await dbService.updateTemplateByTitle(
+      title,
+      req.body
+    );
 
     res.status(200).json(updatedTemplate);
   } catch (error) {
@@ -66,7 +59,7 @@ const deleteTemplate = async (req, res, next) => {
     if (!deletedTemplate) {
       throw new CustomError("Template not found", 404);
     }
-    res.status(204).json({ message: "Template deleted successfully" });
+    res.status(204).end();
   } catch (error) {
     next(error);
   }

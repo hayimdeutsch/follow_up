@@ -29,7 +29,7 @@ const createFollowUp = async (req, res, next) => {
       throw new CustomError("Student not found", 404);
     }
 
-    const teacher = await dbService.getTeacherByGoogleId(req.user.googleId);
+    const teacher = await dbService.getTeacherById(req.user.googleId);
 
     let meetingId = null;
     let questionnaireId = null;

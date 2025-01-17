@@ -15,6 +15,7 @@ const studentsRouter = express.Router();
 
 studentsRouter.use("/followups", followUpStudentRouter);
 //All routes tested with mockAuthenticated
+
 studentsRouter.use(checkAuthenticated);
 // studentsRouter.use(mockAuthenticated);
 

@@ -131,7 +131,7 @@ const getApprovedTeachers = async () => {
   }
 };
 
-const createTemplate = async (title, description, questions) => {
+const createTemplate = async ({ title, description, questions }) => {
   const templateQuestions = questions.map((question) => {
     console.log("question", question);
     return {
@@ -254,15 +254,26 @@ const getStudentById = async (studentId) => {
   }
 };
 
-const getStudentsbyGoogleId = async (teacherId) => {
+const getStudentsByGoogleId = async (teacherGoogleId) => {
   try {
     const teacher = await Teacher.findOne(
-      { googleId: teacherId },
+      { googleId: teacherGoogleId },
       { students: 1, _id: 0 }
     )
       .populate("students")
       .exec();
     return teacher;
+  } catch (error) {
+    throw new CustomError("DB Error", 500, error);
+  }
+};
+
+const getStudentsByTeacherId = async (teacherId) => {
+  try {
+    const students = await Teacher.findById(teacherId)
+      .project("students")
+      .populate("students");
+    return students;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
@@ -576,7 +587,8 @@ export {
   updateTemplateByTitle,
   deleteTemplateByTitle,
   createStudent,
-  getStudentsbyGoogleId,
+  getStudentsByGoogleId,
+  getStudentsByTeacherId,
   getStudentById,
   deleteStudentById,
   updateStudentEmails,
