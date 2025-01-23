@@ -3,6 +3,7 @@ import CustomError from "../utils/CustomError.js";
 import { scheduleCalendarEvent } from "../services/calendarService.js";
 import { sendFromSystem } from "../services/emailService.js";
 import validateHasFields from "../utils/validateHasFields.js";
+import { followupSubmissionTemplate } from "../utils/emailTemplates.js";
 
 const getFollowUp = async (req, res, next) => {
   try {
@@ -43,20 +44,21 @@ const submitFollowUp = async (req, res, next) => {
         400
       );
     }
+
     if (selectedTimeSlot) {
       validateHasFields(selectedTimeSlot, ["startTime", "endTime"]);
-      // const meetingEvent = await scheduleCalendarEvent(
-      //   followUp.teacher,
-      //   followUp.student.firstName + " " + followUp.student.lastName,
-      //   followUp.student.email,
-      //   followUp.meeting.topic,
-      //   selectedTimeSlot
-      // );
-      const meetingEvent = {
-        id: "mockEventId",
-        start: new Date(selectedTimeSlot),
-        end: new Date(selectedTimeSlot),
-      };
+      const meetingEvent = await scheduleCalendarEvent(
+        followUp.teacher,
+        followUp.student.firstName + " " + followUp.student.lastName,
+        followUp.student.email,
+        followUp.meeting.topic,
+        selectedTimeSlot
+      );
+      // const meetingEvent = {
+      //   id: "mockEventId",
+      //   start: new Date(selectedTimeSlot),
+      //   end: new Date(selectedTimeSlot),
+      // };
       await dbService.confirmMeeting(
         followUp.meeting._id,
         selectedTimeSlot,
@@ -69,12 +71,19 @@ const submitFollowUp = async (req, res, next) => {
         questions
       );
     }
-    // need to create a template for this email
+
     const submittedFollowUp = await dbService.submitFollowUpByToken(token);
+    const emailText = followupSubmissionTemplate(
+      followUp.teacher.firstName,
+      followUp.student.firstName + " " + followUp.student.lastName,
+      followUp.student._id,
+      followUp._id
+    );
+
     await sendFromSystem(
       followUp.teacher.email,
-      `${followUp.student.firstName} ${followUp.student.lastName} Follow-Up Submitted`,
-      `The follow-up for ${followUp.student.firstName} ${followUp.student.lastName} has been submitted.`
+      "FollowUp Submitted",
+      emailText
     );
     res.status(200).json(submittedFollowUp);
   } catch (error) {

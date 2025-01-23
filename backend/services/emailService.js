@@ -6,24 +6,22 @@ const sendFromTeacher = async (teacherObj, studentEmail, subject, content) => {
   try {
     await sendGmail(teacherObj, studentEmail, subject, content);
   } catch (error) {
-    console.error("Failed to send email", error);
-    try {
-      const newSubject = `Message from ${teacherObj.firstName} ${teacherObj.lastName}`;
-      await sendFromSystem(studentEmail, newSubject, content);
-    } catch (error) {
-      console.error("Failed to send email", error);
-      throw new CustomError("Failed to send email", 500);
-    }
+    const newSubject = `Message from ${teacherObj.firstName} ${teacherObj.lastName}`;
+    await sendFromSystem(studentEmail, newSubject, content);
   }
 };
 
 const sendFromSystem = async (to, subject, content) => {
-  return await systemTransporter.sendMail({
-    from: process.env.SYSTEM_EMAIL,
-    to,
-    subject,
-    html: content,
-  });
+  try {
+    await systemTransporter.sendMail({
+      from: process.env.SYSTEM_EMAIL,
+      to,
+      subject,
+      html: content,
+    });
+  } catch (error) {
+    throw new CustomError("Failed to send email", 500);
+  }
 };
 
 export { sendFromTeacher, sendFromSystem };

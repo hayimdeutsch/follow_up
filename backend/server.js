@@ -8,6 +8,7 @@ import passport from "./config/passportConfig.js";
 import mainRouter from "./routes/mainRouter.js";
 import errorHandler from "./middleware/errorHandler.js";
 import connectDB from "./config/dbConfig.js";
+import config from "./config/envConfig.js";
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: config.frontendUrl,
     credentials: true,
   })
 );

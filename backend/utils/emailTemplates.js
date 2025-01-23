@@ -1,4 +1,4 @@
-import "dotenv/config";
+import config from "../config/envConfig.js";
 
 const newUserApplicationTemplate = (user) => {
   return `
@@ -7,28 +7,50 @@ const newUserApplicationTemplate = (user) => {
     <p>Here are the details of the applicant:</p>
     <ul>
       <li><strong>Name:</strong> ${user.firstName} ${user.lastName}</li>
-      <li><strong>Email:</strong> ${user.gmail}</li>
+      <li><strong>Email:</strong> ${user.email}</li>
       <li><strong>Phone:</strong> ${user.phone}</li>
     </ul>
 <p>Please review the application and take the necessary actions.</p>
-    <a href="${process.env.FRONTEND_URL}/admin/dashboard" target="_blank">Click here to view all users</a>
+    <a href="${config.frontendUrl}/admin/dashboard" target="_blank">Click here to view all users</a>
     <p>Thank you.</p>
   `;
 };
 
-const followupTemplate = (message, token) => {
-  const body = `${
-    teacherMessage
-      ? `<p>${teacherMessage}</p>`
-      : `<p>Hi ${studentFirstName},</p>
-    <p>At your earliest convenience, please fill out the following questionnaire as a follow up to our classes.</p>`
+const formatFollowupEmail = (emailText, token, followupOptions) => {
+  let linkMessage;
+  if (followupOptions.questionnaire && followupOptions.meeting) {
+    linkMessage =
+      "Click here to fill out the questionnaire and schedule a meeting";
+  } else if (followupOptions.questionnaire) {
+    linkMessage = "Click here to fill out the questionnaire";
+  } else if (followupOptions.meeting) {
+    linkMessage = "Click here to schedule a meeting";
   }
-    <a href="${
-      process.env.FRONTEND_URL
-    }/questionnaires/${token}">Click here to fill out the questionnaire</a>
-    <p>All the best,</p>
-    <p>${teacherName}</p>`;
-  return message;
+  const link = `<a href="${config.frontendUrl}/followups/${token}" target="_blank">${linkMessage}</a>`;
+  const paragraphs = emailText
+    .split("\n")
+    .map((line) => `<p>${line}</p>`)
+    .join("");
+  return `${paragraphs}${link}`;
 };
 
-export { followupTemplate, newUserApplicationTemplate };
+const followupSubmissionTemplate = (
+  teacherName,
+  studentName,
+  studentId,
+  followupId
+) => {
+  return `
+    <p>Hi ${teacherName},</p>
+    <p>${studentName} has submitted a follow-up questionnaire.</p>
+    <a href="${config.frontendUrl}/students/followups/${followupId}?studentId=${studentId}" target="_blank">
+    Click here to view the followup</a>
+    <p>Thank you.</p>
+  `;
+};
+
+export {
+  formatFollowupEmail,
+  newUserApplicationTemplate,
+  followupSubmissionTemplate,
+};

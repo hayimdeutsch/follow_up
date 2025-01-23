@@ -4,7 +4,7 @@ import validateHasFields from "../utils/validateHasFields.js";
 
 const createStudent = async (req, res, next) => {
   try {
-    const teacher = await dbService.getTeacherById(req.user._id);
+    const teacher = await dbService.getTeacherById(req.user.id);
     validateHasFields(req.body, [
       "firstName",
       "lastName",
@@ -26,8 +26,8 @@ const createStudent = async (req, res, next) => {
 
 const getStudentsByTeacher = async (req, res, next) => {
   try {
-    const studentsObject = await dbService.getStudentsByTeacherId(req.user._id);
-    res.status(200).json(studentsObject.students);
+    const students = await dbService.getStudentsByTeacherId(req.user.id);
+    res.status(200).json(students);
   } catch (error) {
     next(error);
   }

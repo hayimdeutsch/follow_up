@@ -3,7 +3,7 @@ import CustomError from "../utils/CustomError.js";
 import { sendFromTeacher } from "../services/emailService.js";
 import generateToken from "../utils/generateToken.js";
 import validateHasFields from "../utils/validateHasFields.js";
-import { request } from "express";
+import { formatFollowupEmail } from "../utils/emailTemplates.js";
 
 const getStudentFollowUps = async (req, res, next) => {
   try {
@@ -29,7 +29,7 @@ const createFollowUp = async (req, res, next) => {
       throw new CustomError("Student not found", 404);
     }
 
-    const teacher = await dbService.getTeacherById(req.user.googleId);
+    const teacher = await dbService.getTeacherById(req.user.id);
 
     let meetingId = null;
     let questionnaireId = null;
@@ -62,8 +62,13 @@ const createFollowUp = async (req, res, next) => {
     );
     await dbService.addFollowupToStudent(studentId, followUp._id);
 
-    // Need to use a template to generate the email text and generate a link
-    await sendFromTeacher(teacher, student.email, title, emailText);
+    const emailContent = formatFollowupEmail(
+      emailText,
+      followUp.token,
+      options
+    );
+
+    await sendFromTeacher(teacher, student.email, title, emailContent);
 
     res.status(201).json(followUp);
   } catch (error) {

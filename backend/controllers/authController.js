@@ -3,8 +3,16 @@ import CustomError from "../utils/CustomError.js";
 import * as dbService from "../services/dbService.js";
 import googleConfig from "../config/googleConfig.js";
 import validateHasFields from "../utils/validateHasFields.js";
+import config from "../config/envConfig.js";
 
 // Tested routes that could be tested without changing redirect using mockAuthenticated
+const confirmAuth = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    throw new CustomError("Unauthorized", 401);
+  } else {
+    res.status(200).json({ message: "Authorized" });
+  }
+};
 
 const checkApprovalStatus = async (req, res, next) => {
   try {
@@ -26,7 +34,7 @@ const checkApprovalStatus = async (req, res, next) => {
 
 const saveRedirectToSession = (req, res, next) => {
   const returnURL = decodeURIComponent(req?.query?.returnTo);
-  const redirectTo = returnURL || `${process.env.FRONTEND_URL}/`;
+  const redirectTo = returnURL || `${config.frontendUrl}/`;
   req.session.redirect = redirectTo;
   req.session.save((err) => {
     if (err) {
@@ -42,24 +50,19 @@ const initiateGoogleAuth = passport.authenticate("google", {
 });
 
 const googleAuthCallbackRedirect = (req, res, next) => {
-  const redirectTo = req.session.redirect || `${process.env.FRONTEND_URL}/`;
-  console.log("req.session before passport.authenticate", req.session);
-
+  const redirectTo = req.session.redirect || `${config.frontendUrl}/`;
   passport.authenticate("google", (err, user, info) => {
     if (err) {
       return next(err);
     }
     if (!user) {
-      return res.redirect(`${process.env.FRONTEND_URL}/`);
+      return res.redirect(`${config.frontendUrl}/`);
     }
 
     req.logIn(user, (err) => {
       if (err) {
         return next(err);
       }
-
-      console.log("req.session after passport.authenticate", req.session);
-
       res.redirect(redirectTo);
     });
   })(req, res, next);
@@ -77,6 +80,7 @@ const getUser = (req, res, next) => {
 };
 
 export {
+  confirmAuth,
   checkApprovalStatus,
   saveRedirectToSession,
   initiateGoogleAuth,

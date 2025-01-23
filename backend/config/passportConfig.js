@@ -2,23 +2,15 @@ import "dotenv/config.js";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import oauthConfig from "./googleConfig.js";
-import {
-  saveUser,
-  getTeacherByGmail,
-  getTeacherByGoogleId,
-} from "../services/dbService.js";
+import * as dbService from "../services/dbService.js";
 
 passport.use(
   new GoogleStrategy(
     oauthConfig,
     async (accessToken, refreshToken, profile, done) => {
-      console.log("profile: ", profile);
-      console.log("accessToken: ", accessToken);
-      console.log("refreshToken: ", refreshToken);
       try {
-        let teacher = await getTeacherByGoogleId(profile.id);
+        let teacher = await dbService.getTeacherByGoogleId(profile.id);
         if (teacher) {
-          console.log("teacher found by google id: ", teacher);
           if (refreshToken) {
             teacher.googleTokens = {
               refreshToken,
@@ -28,9 +20,8 @@ passport.use(
             teacher.googleTokens.accessToken = accessToken;
           }
         } else {
-          teacher = await getTeacherByGmail(profile.emails[0].value);
+          teacher = await dbService.getTeacherByGmail(profile.emails[0].value);
           if (teacher) {
-            console.log("teacher found by gmail: ", teacher);
             teacher.googleId = profile.id;
             teacher.googleTokens = {
               accessToken,
@@ -42,8 +33,7 @@ passport.use(
             });
           }
         }
-        console.log("teacher to save: ", teacher);
-        await saveUser(teacher);
+        await dbService.saveUser(teacher);
         done(null, teacher);
       } catch (error) {
         done(error);
@@ -58,9 +48,15 @@ passport.serializeUser((teacher, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const teacher = await getTeacherByGoogleId(id);
-    // console.log("deserializing teacher", teacher);
-    done(null, teacher);
+    const teacher = await dbService.getTeacherByGoogleId(id);
+    const user = {
+      firstName: teacher.firstName,
+      lastName: teacher.lastName,
+      email: teacher.email,
+      id: teacher._id,
+      phone: teacher.phone,
+    };
+    done(null, user);
   } catch (error) {
     done(error);
   }

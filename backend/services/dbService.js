@@ -18,6 +18,9 @@ const createUser = async (firstName, lastName, email, phone) => {
     await newUser.save();
     return newUser;
   } catch (error) {
+    if (error.code === 11000) {
+      throw new CustomError("User already exists", 409);
+    }
     throw new CustomError("DB Error", 500, error);
   }
 };
@@ -270,10 +273,11 @@ const getStudentsByGoogleId = async (teacherGoogleId) => {
 
 const getStudentsByTeacherId = async (teacherId) => {
   try {
-    const students = await Teacher.findById(teacherId)
-      .project("students")
-      .populate("students");
-    return students;
+    const teacherObject = await Teacher.findById(teacherId).populate(
+      "students"
+    );
+    console.log("teacherObject", teacherObject);
+    return teacherObject.students;
   } catch (error) {
     throw new CustomError("DB Error", 500, error);
   }
@@ -353,7 +357,7 @@ const getFollowUpByToken = async (token) => {
       },
       {
         path: "teacher",
-        select: "firstName lastName email phone googleId _id",
+        select: "firstName lastName email phone googleId _id googleTokens",
       },
       {
         path: "student",

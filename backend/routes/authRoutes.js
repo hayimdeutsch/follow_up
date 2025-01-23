@@ -2,6 +2,7 @@ import { Router } from "express";
 import checkAuthenticated from "../middleware/checkAuthenticated.js";
 import mockAuthenticated from "../mocks/mockAuthenticated.js";
 import {
+  confirmAuth,
   checkApprovalStatus,
   saveRedirectToSession,
   initiateGoogleAuth,
@@ -12,7 +13,9 @@ import {
 
 const authRouter = Router();
 
-authRouter.post("/check-approval", checkApprovalStatus);
+authRouter.get("/check", confirmAuth);
+
+authRouter.post("/check-approved", checkApprovalStatus);
 
 authRouter.get("/google", saveRedirectToSession, initiateGoogleAuth);
 
