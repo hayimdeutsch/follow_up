@@ -4,48 +4,21 @@ import { privateAxios } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 const useProtectedApi = (endpoint, method = "POST") => {
-  const { isAuthenticated, checkAuth, redirectToLogin } = useAuth();
-  const navigate = useNavigate();
+  const {
+    isAuthenticated,
+    checkAuth,
+    redirectToLogin,
+    loading: authLoading,
+  } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const executeRequest = useCallback(
-    async (requestData = null) => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        await checkAuth();
-        if (!isAuthenticated) {
-          const initialUrl = window.location.href;
-          redirectToLogin(initialUrl);
-          throw new Error("Redirecting to login");
-        }
-
-        const response = await privateAxios({
-          method,
-          url: endpoint,
-          data: requestData,
-        });
-
-        setData(response.data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [checkAuth, isAuthenticated, redirectToLogin, endpoint, method]
-  );
 
   useEffect(() => {
     const requestIntercept = privateAxios.interceptors.request.use(
       async (config) => {
-        await checkAuth();
+        if (authLoading) return config;
         if (!isAuthenticated) {
-          const initialUrl = window.location.href;
-          redirectToLogin(initialUrl);
+          redirectToLogin();
           throw new axios.Cancel("Redirecting to login");
         }
         return config;
@@ -69,9 +42,43 @@ const useProtectedApi = (endpoint, method = "POST") => {
       privateAxios.interceptors.request.eject(requestIntercept);
       privateAxios.interceptors.response.eject(responseIntercept);
     };
-  }, [checkAuth, isAuthenticated, redirectToLogin]);
+  }, [checkAuth, isAuthenticated, redirectToLogin, authLoading]);
 
-  return { data, loading, error, executeRequest };
+  const executeRequest = useCallback(
+    async (requestData = null) => {
+      setLoading(true);
+
+      try {
+        if (!endpoint) return;
+
+        while (authLoading) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
+        if (!isAuthenticated) {
+          const initialUrl = window.location.href;
+          redirectToLogin(initialUrl);
+          throw new Error("Redirecting to login");
+        }
+
+        const response = await privateAxios({
+          method,
+          url: endpoint,
+          data: requestData,
+        });
+
+        setData(response.data);
+      } catch (err) {
+        const errMsg = err?.response?.data?.message || "Internal Server Error";
+        throw new Error(errMsg);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [checkAuth, isAuthenticated, redirectToLogin, endpoint, method]
+  );
+
+  return { data, loading, executeRequest };
 };
 
 export default useProtectedApi;
