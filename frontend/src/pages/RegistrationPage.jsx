@@ -1,114 +1,48 @@
-// import React, { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import config from "../config/config";
-
-// const RegistrationPage = () => {
-//   const navigate = useNavigate();
-//   const [firstName, setFirstName] = useState("");
-//   const [lastName, setLastName] = useState("");
-//   const [email, setEmail] = useState("");
-//   const [phone, setPhone] = useState("");
-//   const [error, setError] = useState(null);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const response = await fetch(`${config.backendUrl}/register`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ firstName, lastName, email, phone }),
-//       });
-//       if (response.ok) {
-//         navigate("/login");
-//       } else {
-//         const result = await response.json();
-//         setError(result.message || "Registration failed");
-//       }
-//     } catch (error) {
-//       setError("An error occurred during registration");
-//     }
-//   };
-
-//   return (
-//     <div>
-//       <h1>Register</h1>
-//       {error && <div className="error">{error}</div>}
-//       <form onSubmit={handleSubmit}>
-//         <div>
-//           <label>First Name:</label>
-//           <input
-//             type="text"
-//             value={firstName}
-//             onChange={(e) => setFirstName(e.target.value)}
-//             required
-//           />
-//         </div>
-//         <div>
-//           <label>Last Name:</label>
-//           <input
-//             type="text"
-//             value={lastName}
-//             onChange={(e) => setLastName(e.target.value)}
-//             required
-//           />
-//         </div>
-//         <div>
-//           <label>Email:</label>
-//           <input
-//             type="email"
-//             value={email}
-//             onChange={(e) => setEmail(e.target.value)}
-//             required
-//           />
-//         </div>
-//         <div>
-//           <label>Phone:</label>
-//           <input
-//             type="tel"
-//             value={phone}
-//             onChange={(e) => setPhone(e.target.value)}
-//             required
-//           />
-//         </div>
-//         <button type="submit">Register</button>
-//       </form>
-//       <button onClick={(e) => navigate("/login")}>Login</button>
-//     </div>
-//   );
-// };
-
-// export default RegistrationPage;
-
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useSubmit from "../hooks/useSubmit";
-import { validateGmail } from "../services/validators";
+import * as yup from "yup";
+
+import FormContainer from "../components/Form/FormContainer";
+import TextField from "../components/Form/TextField";
+import PhoneNumberField from "../components/Form/PhoneNumberField";
+import SubmitButton from "../components/Form/SubmitButton";
+
+const schema = yup.object().shape({
+  firstName: yup.string().required("First Name is required"),
+  lastName: yup.string().required("Last Name is required"),
+  phone: yup.object().shape({
+    countryCode: yup.string().required("Country code is required"),
+    phoneNumber: yup
+      .string()
+      .required("Phone number is required")
+      .matches(/^[0-9]+$/, "Must be only digits")
+      .min(8, "Phone number must be at least 8 digits")
+      .max(13, "Phone number must be at most 13 digits"),
+  }),
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Invalid email")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@gmail.com$/,
+      "Only Gmail accounts are allowed"
+    ),
+});
 
 const RegistrationPage = () => {
+  const { loading, data: respData, submit } = useSubmit("/register");
   const navigate = useNavigate();
-  const {
-    handleSubmit,
-    control,
-    setError,
-    formState: { errors },
-  } = useForm();
-  const { loading, error, data, submit } = useSubmit("/register");
 
-  const onSubmit = async (data) => {
+  const handleFormSubmit = async (data, setError) => {
     try {
-      console.log(data);
-      validateGmail(data.email);
-      await submit(data);
-      if (error) {
-        setError("form", {
-          type: "manual",
-          message: error,
-        });
-      }
+      const combinedPhone = `${data.phone.countryCode}${data.phone.phoneNumber}`;
+      const formData = { ...data, phone: combinedPhone };
+      await submit(formData);
+      alert(
+        "Registration successful. An email will be sent to the admin for approval."
+      );
+      navigate("/login");
     } catch (error) {
       setError("form", {
         type: "manual",
@@ -118,97 +52,22 @@ const RegistrationPage = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Register
-        </Typography>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Controller
-            name="firstName"
-            control={control}
-            defaultValue=""
-            rules={{ required: "First Name is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="First Name"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                error={!!errors.firstName}
-                helperText={errors.firstName ? errors.firstName.message : ""}
-              />
-            )}
-          />
-          <Controller
-            name="lastName"
-            control={control}
-            defaultValue=""
-            rules={{ required: "Last Name is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Last Name"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                error={!!errors.lastName}
-                helperText={errors.lastName ? errors.lastName.message : ""}
-              />
-            )}
-          />
-          <Controller
-            name="email"
-            control={control}
-            defaultValue=""
-            rules={{ required: "Email is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Email"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                error={!!errors.email}
-                helperText={errors.email ? errors.email.message : ""}
-              />
-            )}
-          />
-          <Controller
-            name="phone"
-            control={control}
-            defaultValue=""
-            rules={{ required: "Phone is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Phone"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                error={!!errors.phone}
-                helperText={errors.phone ? errors.phone.message : ""}
-              />
-            )}
-          />
-          {errors.form && (
-            <Typography color="error" variant="body2">
-              {errors.form.message}
-            </Typography>
-          )}
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2 }}
-          >
-            Register
-          </Button>
-        </form>
-      </Box>
-    </Container>
+    <FormContainer
+      defaultValues={{
+        firstName: "",
+        lastName: "",
+        phone: { countryCode: "+1", phoneNumber: "" },
+        email: "",
+      }}
+      onSubmit={(data, methods) => handleFormSubmit(data, methods.setError)}
+      validationSchema={schema}
+    >
+      <TextField name="firstName" label="First Name" />
+      <TextField name="lastName" label="Last Name" />
+      <PhoneNumberField name="phone" label="Phone" />
+      <TextField name="email" label="Email" />
+      <SubmitButton label="Register" disabled={loading} />
+    </FormContainer>
   );
 };
 
