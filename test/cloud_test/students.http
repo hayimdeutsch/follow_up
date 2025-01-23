@@ -1,5 +1,5 @@
 ### Create Student First
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students
+POST https://kallahconnect.com/api/v1/students
 Content-Type: application/json
 
 {

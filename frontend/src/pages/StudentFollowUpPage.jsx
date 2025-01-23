@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Questionnaire from "../components/Questionnaire";
 import MeetingTimeSelector from "../components/MeetingTimeSelector";
+import { backendUrl } from "../config/config";
 
 const StudentFollowUpPage = () => {
   const { token } = useParams();
@@ -14,12 +15,9 @@ const StudentFollowUpPage = () => {
   useEffect(() => {
     const fetchFollowUp = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/followups/${token}`,
-          {
-            credentials: "include",
-          }
-        );
+        const response = await fetch(`${backendUrl}/followups/${token}`, {
+          credentials: "include",
+        });
         if (response.ok) {
           const data = await response.json();
           setQuestionnaire(data.questionnaire);
@@ -47,7 +45,7 @@ const StudentFollowUpPage = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/followups/${token}`, {
+      const response = await fetch(`${backendUrl}/followups/${token}`, {
         method: "PUT",
         credentials: "include",
         headers: {

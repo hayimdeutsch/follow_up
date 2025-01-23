@@ -1,5 +1,5 @@
 ### Check Approval of Approved User
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/auth/check-approval
+POST https://kallahconnect.com/api/v1/auth/check-approval
 Content-Type: application/json
 
 {
@@ -8,7 +8,7 @@ Content-Type: application/json
 
 ###
 ### Check Approval of Unapproved User
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/auth/check-approval
+POST https://kallahconnect.com/api/v1/auth/check-approval
 Content-Type: application/json
 
 {
@@ -17,11 +17,11 @@ Content-Type: application/json
 
 ###
 ### See what returns from google auth
-GET  http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/auth/google
+GET  https://kallahconnect.com/api/v1/auth/google
 
 ###
 ### Get User
-GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/auth/user
+GET https://kallahconnect.com/api/v1/auth/user
 
 # Response when using mock authentification
 # {

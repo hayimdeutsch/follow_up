@@ -124,31 +124,28 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import generateToken from "../utils/generateToken.js";
-import useAuthenticatedFetch from "../hooks/useAuthenticatedFetch.js";
+import useAuthenticatedFetch from "../hooks/useFetch.js";
 import ScheduledEmails from "../components/ScheduledEmails";
 import FollowUpList from "../components/FollowUpList";
 
 const StudentPage = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
-  const token = useRef(generateToken());
   const [fetchTrigger, setFetchTrigger] = useState(false);
   const {
     data: student,
     error,
     loading,
-  } = useAuthenticatedFetch(
-    `http://localhost:3000/teachers/students/${studentId}`,
-    { trigger: fetchTrigger }
-  );
+  } = useAuthenticatedFetch(`/students/${studentId}`, {
+    trigger: fetchTrigger,
+  });
 
   const handleEmailsChange = (updatedEmails) => {
     setFetchTrigger(!fetchTrigger);
   };
 
   const handleNavigate = (options) => {
-    navigate(`/students/${studentId}/followup?token=${token.current}`, {
+    navigate(`/students/${studentId}/followup`, {
       state: { options, student },
     });
   };

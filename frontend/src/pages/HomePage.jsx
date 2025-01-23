@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from "react";
-import LogoutButton from "../components/LogoutButton";
+import useProtectedFetch from "../hooks/useProtectedFetch";
 import TeacherDashboard from "../components/TeacherDashboard";
-
-import useAuthenticatedFetch from "../hooks/useAuthenticatedFetch.js";
+import LogoutButton from "../components/LogoutButton";
 
 const HomePage = () => {
-  const {
-    data: user,
-    loading,
-    error,
-  } = useAuthenticatedFetch("http://localhost:3000/auth/user");
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const { data: user, loading, error } = useProtectedFetch("/auth/user");
 
   return (
     <>
       {loading && <div>Loading...</div>}
-      {error && <div>{error}</div>}
+      {error && <div>{error.message}</div>}
       {user && <TeacherDashboard user={user.firstName} />}
       {user && <LogoutButton />}
     </>

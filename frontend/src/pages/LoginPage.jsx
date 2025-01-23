@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPage = () => {
   const [searchParams] = useSearchParams();
-  const redirectURL =
-    searchParams.get("redirectTo") || "/http://localhost:5173";
+  const redirectURL = searchParams.get("redirectTo");
   const [gmail, setGmail] = useState("");
   const [error, setError] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleRegisterClick = () => {
+    navigate("/register");
+  };
 
   const handleGmailChange = (e) => {
     setError("");
@@ -15,31 +21,14 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = async () => {
-    if (!gmail) {
+    if (!gmail.includes("gmail.com")) {
       setError("Please enter a valid Gmail account");
       return;
     }
     try {
-      const checkUrl = isAdmin
-        ? "http://localhost:3000/admin/check-admin"
-        : "http://localhost:3000/auth/check-approval";
-      const response = await fetch(checkUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ gmail }),
-      });
-      if (response.ok) {
-        window.location.href = `http://localhost:3000/auth/google?returnTo=${encodeURIComponent(
-          redirectURL
-        )}`;
-      } else {
-        const result = await response.json();
-        setError(result.message || "Login failed");
-      }
+      login(gmail, isAdmin, redirectURL);
     } catch (error) {
-      setError("Login failed");
+      setError(error.message);
     }
   };
 
@@ -60,6 +49,7 @@ const LoginPage = () => {
       />
       <label>Admin</label>
       <button onClick={handleGoogleLogin}>Login with Google</button>
+      <button onClick={handleRegisterClick}>Register</button>
       {error && <div className="error">{error}</div>}
     </div>
   );

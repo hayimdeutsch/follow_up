@@ -1,5 +1,5 @@
 ### Check Admin Core
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/check-admin
+POST https://kallahconnect.com/api/v1/admin/check-admin
 Content-Type: application/json
 
 {
@@ -13,7 +13,7 @@ Content-Type: application/json
 
 ###
 ### Check Admin without email
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/check-admin
+POST https://kallahconnect.com/api/v1/admin/check-admin
 Content-Type: application/json
 
 {
@@ -27,7 +27,7 @@ Content-Type: application/json
 
 ###
 ### Check Admin Hayim
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/check-admin
+POST https://kallahconnect.com/api/v1/admin/check-admin
 Content-Type: application/json
 
 {
@@ -42,7 +42,7 @@ Content-Type: application/json
 
 ###
 ### Get Pending Users
-GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/pending
+GET https://kallahconnect.com/api/v1/admin/users/pending
 
 # Response
 # [
@@ -70,7 +70,7 @@ GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/use
 
 ###
 ### Get Approved Users
-GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/approved
+GET https://kallahconnect.com/api/v1/admin/users/approved
 
 # Response
 # [
@@ -93,7 +93,7 @@ GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/use
 
 ###
 ### Approve already approved User - Hayim Deutsch
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/6789631198083d1a3b1e13e0/approve
+POST https://kallahconnect.com/api/v1/admin/users/6789631198083d1a3b1e13e0/approve
 
 # Response
 # {
@@ -102,7 +102,7 @@ POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/us
 
 ###
 ### Approve User - unapprovedUser2@gmail
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/6789699525cbfe76a92c7bfb/approve
+POST https://kallahconnect.com/api/v1/admin/users/678d5388fccf34dcaeb10bcf/approve
 
 # Response
 # {
@@ -111,14 +111,14 @@ POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/us
 
 ###
 ### Delete User - First User
-DELETE http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/6787a7845659cd7edb62ac11
+DELETE https://kallahconnect.com/api/v1/admin/users/6789699525cbfe76a92c7bfb
 
 # Response
 # HTTP/1.1 204 No Contentd
 
 ###
 ### Delete User - Non-existent User
-DELETE http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/6787a7845659cd7edb62ac12
+DELETE https://kallahconnect.com/api/v1/admin/users/6787a7845659cd7edb62ac12
 
 # Response
 # HTTP/1.1 404 Not Found
@@ -128,13 +128,13 @@ DELETE http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/
 
 ###
 ### Create approved User
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/approved
+POST https://kallahconnect.com/api/v1/admin/users/approved
 Content-Type: application/json
 
 {
   "firstName": "Approved",
   "lastName": "User",
-  "email": "approvedUser@gmail.com",
+  "email": "approvedUser2@gmail.com",
   "phone": "123-456-7890"
 }
 
@@ -153,7 +153,7 @@ Content-Type: application/json
 
 ###
 ### Create approved user that already exists
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/approved
+POST https://kallahconnect.com/api/v1/admin/users/approved
 Content-Type: application/json
 
 {
@@ -170,7 +170,7 @@ Content-Type: application/json
 
 ###
 ### Create approved user with missing fields
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/admin/users/approved
+POST https://kallahconnect.com/api/v1/admin/users/approved
 Content-Type: application/json
 
 {

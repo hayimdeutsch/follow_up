@@ -1,58 +1,79 @@
 import React, { useState } from "react";
+import useSubmit from "../hooks/useSubmit.js";
+import { protectedApi } from "../services/api.js";
+// import { validateAddStudent } from "../services/validators.js";
 
-const AddStudentForm = ({ teacher }) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [eventDate, setEventDate] = useState("");
-  const [scheduledEmails, setScheduledEmails] = useState([
-    { scheduledDate: "" },
-  ]);
-  const [error, setError] = useState("");
+const AddStudentForm = () => {
+  const [inputError, setInputError] = useState(null);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    eventDate: "",
+    scheduledEmails: [{ scheduledDate: "" }],
+  });
+
+  const {
+    loading,
+    data,
+    error: submissionError,
+    submit,
+  } = useSubmit("/students", protectedApi);
+
+  const handleInputChange = (e) => {
+    setInputError(null);
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   const handleAddFollowUp = () => {
-    setScheduledEmails([...scheduledEmails, { scheduledDate: "" }]);
+    setFormData((prevData) => ({
+      ...prevData,
+      scheduledEmails: [...prevData.scheduledEmails, { scheduledDate: "" }],
+    }));
   };
 
   const handleFollowUpChange = (index, value) => {
-    const newScheduledEmails = scheduledEmails.map((followUp, i) =>
+    const newScheduledEmails = formData.scheduledEmails.map((followUp, i) =>
       i === index ? { scheduledDate: value } : followUp
     );
-    setScheduledEmails(newScheduledEmails);
+    setFormData((prevData) => ({
+      ...prevData,
+      scheduledEmails: newScheduledEmails,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:3000/teachers/students`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          eventDate,
-          scheduledEmails,
-        }),
-      });
-      if (response.ok) {
-        alert("Student added successfully");
-        // Clear the form
-        setFirstName("");
-        setLastName("");
-        setEmail("");
-        setEventDate("");
-        setScheduledEmails([{ scheduledDate: "" }]);
-      } else {
-        setError("Failed to add student");
-      }
+      //validateAddStudent(formData);
     } catch (error) {
-      setError("Error: " + error.message);
+      setInputError(error.message);
     }
+    submit(formData);
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (submissionError) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (data) {
+    alert("Student added successfully");
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      eventDate: "",
+      scheduledEmails: [{ scheduledDate: "" }],
+    });
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -60,8 +81,9 @@ const AddStudentForm = ({ teacher }) => {
         <label>First Name:</label>
         <input
           type="text"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleInputChange}
           required
         />
       </div>
@@ -69,8 +91,9 @@ const AddStudentForm = ({ teacher }) => {
         <label>Last Name:</label>
         <input
           type="text"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleInputChange}
           required
         />
       </div>
@@ -78,8 +101,9 @@ const AddStudentForm = ({ teacher }) => {
         <label>Email:</label>
         <input
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
           required
         />
       </div>
@@ -87,28 +111,27 @@ const AddStudentForm = ({ teacher }) => {
         <label>Event Date:</label>
         <input
           type="date"
-          value={eventDate}
-          onChange={(e) => setEventDate(e.target.value)}
+          name="eventDate"
+          value={formData.eventDate}
+          onChange={handleInputChange}
           required
         />
       </div>
       <div>
-        <label>Follow Up Emails:</label>
-        {scheduledEmails.map((followUp, index) => (
+        <label>Scheduled Emails:</label>
+        {formData.scheduledEmails.map((followUp, index) => (
           <div key={index}>
             <input
               type="date"
               value={followUp.scheduledDate}
               onChange={(e) => handleFollowUpChange(index, e.target.value)}
-              required
             />
           </div>
         ))}
         <button type="button" onClick={handleAddFollowUp}>
-          Add Follow Up
+          Add Follow-Up Email
         </button>
       </div>
-      {error && <p>{error}</p>}
       <button type="submit">Add Student</button>
     </form>
   );

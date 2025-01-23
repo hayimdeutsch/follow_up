@@ -3,13 +3,11 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import QuestionnaireForm from "../components/QuestionnaireForm";
 import MeetingSelector from "../components/MeetingSelector";
 import EmailForm from "../components/EmailForm";
-import generateToken from "../utils/generateToken";
+import { backendUrl } from "../config/config.js";
 
 const FollowUpPage = () => {
   const { studentId } = useParams();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get("token") || generateToken();
   const [emailText, setEmailText] = useState("");
   const [questionnaire, setQuestionnaire] = useState({});
   const [meeting, setMeeting] = useState({});
@@ -32,11 +30,9 @@ const FollowUpPage = () => {
         .join("");
     };
 
-    const emailHtml = convertToHtml(emailText);
-
     try {
       const response = await fetch(
-        `http://localhost:3000/followups/${studentId}`,
+        `${backendUrl}/students/${studentId}/followups`,
         {
           method: "POST",
           headers: {
@@ -45,8 +41,7 @@ const FollowUpPage = () => {
           credentials: "include",
           body: JSON.stringify({
             title,
-            emailText: emailHtml,
-            token,
+            emailText,
             options: { isQuestionnaire, isMeeting },
             questionnaire,
             meeting,
@@ -93,7 +88,6 @@ const FollowUpPage = () => {
       {isMeeting && <MeetingSelector onMeetingChange={setMeeting} />}
       <EmailForm
         student={student}
-        token={token}
         isQuestionnaire={isQuestionnaire}
         isMeeting={isMeeting}
         handleSendEmail={handleSubmit}

@@ -1,34 +1,27 @@
 import React, { useState, useEffect } from "react";
 import Question from "./Question";
 import QuestionForm from "./QuestionForm";
+import { backendUrl } from "../config/config.js";
+import useAuthenticatedFetch from "../hooks/useFetch.js";
 
 const QuestionnaireForm = ({ onQuestionnaireChange }) => {
   const [title, setTitle] = useState("");
   const [questions, setQuestions] = useState([]);
-  const [templates, setTemplates] = useState([]);
+  const {
+    data: templates,
+    error,
+    loading,
+  } = useAuthenticatedFetch("/templates");
   const [selectedTemplate, setSelectedTemplate] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:3000/templates", {
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setTemplates(data.templates);
-      })
-      .catch((error) => {
-        console.error("Error fetching templates:", error);
-      });
-  }, []);
-
-  useEffect(() => {
     if (selectedTemplate) {
-      fetch(`http://localhost:3000/templates/${selectedTemplate}`, {
+      fetch(`${backendUrl}/templates/${selectedTemplate}`, {
         credentials: "include",
       })
         .then((response) => response.json())
-        .then((data) => {
-          setQuestions(data.questions);
+        .then((questions) => {
+          setQuestions(questions);
         })
         .catch((error) => {
           console.error("Error fetching questions:", error);
@@ -62,21 +55,23 @@ const QuestionnaireForm = ({ onQuestionnaireChange }) => {
         onChange={(e) => setSelectedTemplate(e.target.value)}
       >
         <option value="">Select a Template</option>
-        {templates.map((template, index) => (
-          <option key={index} value={template.id}>
-            {template.title}
-          </option>
-        ))}
+        {templates &&
+          templates.map((template, index) => (
+            <option key={index} value={template.id}>
+              {template.title}
+            </option>
+          ))}
       </select>
       <ul>
-        {questions.map((question, index) => (
-          <Question
-            key={index}
-            question={question}
-            index={index}
-            handleDeleteQuestion={handleDeleteQuestion}
-          />
-        ))}
+        {questions &&
+          questions.map((question, index) => (
+            <Question
+              key={index}
+              question={question}
+              index={index}
+              handleDeleteQuestion={handleDeleteQuestion}
+            />
+          ))}
       </ul>
       <QuestionForm handleAddQuestion={handleAddQuestion} />
     </div>

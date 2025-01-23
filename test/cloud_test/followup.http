@@ -1,5 +1,5 @@
 ### Get First Student Follow-Ups
-GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896526dbfd25f355091bcf/followups
+GET https://kallahconnect.com/api/v1/students/67896526dbfd25f355091bcf/followups
 
 # Response
 # HTTP/1.1 200 OK
@@ -7,7 +7,7 @@ GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/
 
 ###
 ### Get Hayim Student Follow-Ups
-GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups
+GET https://kallahconnect.com/api/v1/students/67896535dbfd25f355091bd7/followups
 
 # Response
 # HTTP/1.1 200 OK
@@ -49,7 +49,7 @@ GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/
 
 ###
 ### Create a Follow-Up for Hayim Student
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups
+POST https://kallahconnect.com/api/v1/students/67896535dbfd25f355091bd7/followups
 Content-Type: application/json
 
 {
@@ -293,7 +293,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request without Title
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST https://kallahconnect.com/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
 Content-Type: application/json
 
 {
@@ -337,7 +337,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request without Email Text
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST https://kallahconnect.com/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
 Content-Type: application/json
 
 {
@@ -381,7 +381,7 @@ Content-Type: application/json
 
 ###
 ### Follow-Up Request with empty body
-POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
+POST https://kallahconnect.com/api/v1/students/6787ff7b673d5a06e3e0b59d/followups
 Content-Type: application/json
 
 {}
@@ -460,7 +460,7 @@ Content-Type: application/json
 
 ###
 ### Get Follow-Up By ID
-GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups/678972b360aaed784bf56c6c
+GET https://kallahconnect.com/api/v1/students/67896535dbfd25f355091bd7/followups/678972b360aaed784bf56c6c
 
 # Response
 # HTTP/1.1 200 OK
@@ -519,7 +519,7 @@ GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/
 
 ###
 ### Update Hayim Student's Follow-Up By ID
-PUT http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/67896535dbfd25f355091bd7/followups/6789723260aaed784bf56c2c
+PUT https://kallahconnect.com/api/v1/students/67896535dbfd25f355091bd7/followups/6789723260aaed784bf56c2c
 Content-Type: application/json
 
 {
@@ -786,7 +786,7 @@ DELETE http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/studen
 
 ###
 ### Get Hayim Student's Follow-Up By Token
-GET http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/students/followups/82db34a9cda73214
+GET https://kallahconnect.com/api/v1/students/followups/82db34a9cda73214
 
 # Response
 # HTTP/1.1 200 OK

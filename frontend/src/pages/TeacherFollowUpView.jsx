@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import useAuthenticatedFetch from "../hooks/useAuthenticatedFetch.js";
+import useAuthenticatedFetch from "../hooks/useFetch.js";
 
 const TeacherFollowUpView = () => {
   const { token } = useParams();
@@ -8,7 +8,7 @@ const TeacherFollowUpView = () => {
     data: followUp,
     error,
     loading,
-  } = useAuthenticatedFetch(`http://localhost:3000/followups/${token}`);
+  } = useAuthenticatedFetch(`/followups/${token}`);
 
   if (loading) {
     return <div>Loading...</div>;

@@ -1,12 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { backendUrl } from "../config/config.js";
 
 const LogoutButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:3000/auth/logout", {
+      const response = await fetch(`${backendUrl}/auth/logout`, {
         credentials: "include",
       });
       if (response.ok) {

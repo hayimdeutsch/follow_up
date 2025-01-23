@@ -12,15 +12,13 @@ const EmailForm = ({
 
   useEffect(() => {
     if (!emailModified) {
-      const followUpLink = new URL(`/followup/${token}`, window.location.origin)
-        .href;
       let defaultText = `Dear ${student.firstName},\n\n`;
       if (isQuestionnaire && isMeeting) {
-        defaultText += `Please fill out the questionnaire and schedule a meeting using the following link: ${followUpLink}\n\n`;
+        defaultText += `Please fill out the questionnaire and schedule a meeting using the following link: \n\n`;
       } else if (isQuestionnaire) {
-        defaultText += `Please fill out the questionnaire using the following link: ${followUpLink}\n\n`;
+        defaultText += `Please fill out the questionnaire using the following link: \n\n`;
       } else if (isMeeting) {
-        defaultText += `Please schedule a meeting using the following link: ${followUpLink}\n\n`;
+        defaultText += `Please schedule a meeting using the following link: \n\n`;
       }
       defaultText += `Best regards,\nYour Teacher`;
       setEmailText(defaultText);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { backendUrl } from "../config/config.js";
 
 const ScheduledEmails = ({ studentId, initialEmails, onEmailsChange }) => {
   const [scheduledEmails, setScheduledEmails] = useState(initialEmails);
@@ -25,7 +26,7 @@ const ScheduledEmails = ({ studentId, initialEmails, onEmailsChange }) => {
   const updateScheduledEmails = async (emails) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/teachers/students/${studentId}/emails`,
+        `${backendUrl}/students/${studentId}/emails`,
         {
           method: "PUT",
           credentials: "include",

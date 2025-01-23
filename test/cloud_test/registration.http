@@ -61,6 +61,24 @@ Content-Type: application/json
 # }
 
 ###
+### Create user using domain
+POST https://kallahconnect.com/api/v1/register
+Content-Type: application/json
+
+{
+  "firstName": "Domain",
+  "lastName": "User",
+  "phone": "123-456-7890",
+  "email": "user@gmail.com"
+}
+
+# Response
+# HTTP/1.1 201 Created
+# {
+#   "message": "Application successfully submitted"
+# }
+
+###
 ### Create user with no gmail
 POST http://ec2-16-170-45-41.eu-north-1.compute.amazonaws.com:80/api/v1/register
 Content-Type: application/json
