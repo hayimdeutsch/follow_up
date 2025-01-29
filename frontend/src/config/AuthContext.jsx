@@ -6,8 +6,8 @@ import React, {
   useRef,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { frontendUrl, backendUrl } from "../config/config.js";
-import { api } from "../config/config.js";
+import { frontendUrl, backendUrl } from "./config.js";
+import { api } from "./config.js";
 import { normalizeUrl } from "../services/utils.js";
 
 const AuthContext = createContext();
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
     try {
       let res = null;
       if (isAdmin) {
-        res = await api.post("auth/check-admin", { email });
+        res = await api.post("admin/check-admin", { email });
       } else {
         res = await api.post("/auth/check-approved", { email });
       }
@@ -67,9 +67,10 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.get("/auth/logout");
       setIsAuthenticated(false);
-      navigate("/login");
     } catch (error) {
       throw new Error("Login failed");
+    } finally {
+      navigate("/login");
     }
   };
 

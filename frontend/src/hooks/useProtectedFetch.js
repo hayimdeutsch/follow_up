@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { privateAxios } from "../config/config";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../config/AuthContext";
 
 const useProtectedFetch = (endpoint, trigger = null) => {
   const {
@@ -22,6 +22,9 @@ const useProtectedFetch = (endpoint, trigger = null) => {
         if (authLoading) return config;
         if (!isAuthenticated) {
           let initialUrl;
+          console.log("hasFetched", hasFetched.current);
+          console.log("window.location.href", window.location.href);
+          localStorage.setItem("initialUrl", window.location.href);
           if (!hasFetched.current) {
             initialUrl = window.location.href;
             hasFetched.current = true;
@@ -37,9 +40,14 @@ const useProtectedFetch = (endpoint, trigger = null) => {
     const responseIntercept = privateAxios.interceptors.response.use(
       (response) => response,
       async (error) => {
-        if (error.response.status === 401) {
-          redirectToLogin();
-          return Promise.reject(error);
+        if (!hasFetched.current) {
+          hasFetched.current = true;
+          initialUrl = window.location.href;
+          localStorage.setItem("initialUrl", window.location.href);
+          if (error.response.status === 401) {
+            redirectToLogin(initialUrl);
+            return Promise.reject(error);
+          }
         }
         return Promise.reject(error);
       }

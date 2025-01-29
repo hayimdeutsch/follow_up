@@ -1,31 +1,48 @@
+import React, { useState, useEffect } from "react";
+import { Box, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import useAuthenticatedFetch from "../hooks/useFetch";
+import useProtectedFetch from "../hooks/useProtectedFetch";
 import AddStudentForm from "./AddStudentForm";
+import StudentTable from "./StudentTable";
 
 const TeacherDashboard = ({ user }) => {
-  const { data: students, error, loading } = useAuthenticatedFetch("/students");
+  const [trigger, setTrigger] = useState(0);
+  const {
+    data: students,
+    error,
+    loading,
+  } = useProtectedFetch("/students", trigger);
+
+  const refresh = () => {
+    setTrigger((prev) => prev + 1);
+  };
 
   return (
-    <div>
-      <h1>Welcome, {user}!</h1>
-      <p>You are successfully signed in!</p>
-      <AddStudentForm teacher={user} />
-      <h2>Students</h2>
-      {error && <div>{error}</div>}
-      <ul>
-        {students &&
-          students.map((student) => {
-            const { _id: studentId, firstName, lastName, email } = student;
-            return (
-              <li key={studentId}>
-                <Link to={`/students/${studentId}`}>
-                  {firstName} {lastName} {email}
-                </Link>
-              </li>
-            );
-          })}
-      </ul>
-    </div>
+    <>
+      <Box>
+        <Typography variant="h4" gutterBottom>
+          Welcome, {user}!
+        </Typography>
+        <Typography variant="body1" gutterBottom>
+          You are successfully signed in! This is your home to manage students.
+        </Typography>
+        <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={2}>
+          <Box flex={1}>
+            <Typography variant="h5" gutterBottom>
+              Students
+            </Typography>
+            {loading && <Typography>Loading...</Typography>}
+            {error && (
+              <Typography color="error">Error: {error.message}</Typography>
+            )}
+            <StudentTable students={students} triggerRefresh={refresh} />
+          </Box>
+          <Box flex={1}>
+            <AddStudentForm teacher={user} triggerRefresh={refresh} />
+          </Box>
+        </Box>
+      </Box>
+    </>
   );
 };
 

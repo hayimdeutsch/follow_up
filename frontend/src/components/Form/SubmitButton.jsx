@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Button } from "@mui/material";
 import { useFormContext } from "react-hook-form";
 
-const SubmitButton = ({ label, ...props }) => {
+const SubmitButton = ({ label, watchFields = [], sx, ...props }) => {
   const {
     formState: { errors },
     clearErrors,
@@ -11,13 +11,7 @@ const SubmitButton = ({ label, ...props }) => {
   const prevValues = useRef({});
 
   // Watch specific fields
-  const watchedFields = watch([
-    "firstName",
-    "lastName",
-    "phone.countryCode",
-    "phone.phoneNumber",
-    "email",
-  ]);
+  const watchedFields = watch(watchFields);
 
   useEffect(() => {
     const hasChanged = Object.keys(watchedFields).some(
@@ -34,9 +28,10 @@ const SubmitButton = ({ label, ...props }) => {
   return (
     <Button
       variant="contained"
-      color="primary"
+      color={errors.form ? "error" : "primary"}
       type="submit"
       fullWidth
+      sx={sx}
       {...props}
     >
       {errors.form ? errors.form.message : label}

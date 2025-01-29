@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { privateAxios } from "../services/api";
-import { useAuth } from "../context/AuthContext";
+import { privateAxios } from "../config/config";
+import { useAuth } from "../config/AuthContext";
 
-const useProtectedApi = (endpoint, method = "POST") => {
+const useProtectedApi = () => {
   const {
     isAuthenticated,
     checkAuth,
@@ -45,7 +44,7 @@ const useProtectedApi = (endpoint, method = "POST") => {
   }, [checkAuth, isAuthenticated, redirectToLogin, authLoading]);
 
   const executeRequest = useCallback(
-    async (requestData = null) => {
+    async (endpoint, method = "POST", requestData = null) => {
       setLoading(true);
 
       try {
@@ -61,11 +60,13 @@ const useProtectedApi = (endpoint, method = "POST") => {
           throw new Error("Redirecting to login");
         }
 
-        const response = await privateAxios({
+        const config = {
           method,
           url: endpoint,
-          data: requestData,
-        });
+          ...(method !== "DELETE" && { data: requestData }),
+        };
+
+        const response = await privateAxios(config);
 
         setData(response.data);
       } catch (err) {
@@ -75,7 +76,7 @@ const useProtectedApi = (endpoint, method = "POST") => {
         setLoading(false);
       }
     },
-    [checkAuth, isAuthenticated, redirectToLogin, endpoint, method]
+    [checkAuth, isAuthenticated, redirectToLogin]
   );
 
   return { data, loading, executeRequest };

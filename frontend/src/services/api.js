@@ -1,6 +1,6 @@
 import axios from "axios";
 import { backendUrl } from "../config/config.js";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../config/AuthContext.jsx";
 
 const api = axios.create({
   baseURL: backendUrl,

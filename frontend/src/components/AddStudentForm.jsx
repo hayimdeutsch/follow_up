@@ -1,140 +1,163 @@
-import React, { useState } from "react";
-import useSubmit from "../hooks/useSubmit.js";
-import { protectedApi } from "../services/api.js";
-// import { validateAddStudent } from "../services/validators.js";
+import React, { useEffect, useState } from "react";
+import * as yup from "yup";
+import { useFormContext, useFieldArray } from "react-hook-form";
+import useProtectedApi from "../hooks/useProtectedApi";
+import {
+  Button,
+  Box,
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+} from "@mui/material";
+import FormContainer from "../components/Form/FormContainer";
+import TextField from "../components/Form/TextField";
+import DateField from "../components/Form/DateField";
+import SubmitButton from "../components/Form/SubmitButton";
+import ScheduledEmails from "./ScheduledEmails2";
 
-const AddStudentForm = () => {
-  const [inputError, setInputError] = useState(null);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    eventDate: "",
-    scheduledEmails: [{ scheduledDate: "" }],
-  });
+const schema = yup.object().shape({
+  firstName: yup.string().required("First Name is required"),
+  lastName: yup.string().required("Last Name is required"),
+  email: yup.string().required("Email is required").email("Invalid email"),
+  eventDate: yup
+    .date()
+    .required("Event Date is required")
+    .typeError("Event Date must be a valid date"),
+  scheduledEmails: yup
+    .array()
+    .of(
+      yup.object().shape({
+        scheduledDate: yup
+          .date()
+          .nullable()
+          .transform((value, originalValue) =>
+            originalValue === "" || originalValue === undefined ? null : value
+          )
+          .typeError("Scheduled Date must be a valid date")
+          .test(
+            "is-future-date",
+            "Scheduled Date must be in the future",
+            (value) => {
+              if (!value) return true;
+              return new Date(value) > new Date();
+            }
+          ),
+      })
+    )
+    .transform((value) => value.filter((email) => email.scheduledDate))
+    .default([]),
+});
 
+const AddStudentModal = ({ triggerRefresh }) => {
+  const [open, setOpen] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const {
     loading,
-    data,
     error: submissionError,
-    submit,
-  } = useSubmit("/students", protectedApi);
+    executeRequest: submit,
+  } = useProtectedApi();
 
-  const handleInputChange = (e) => {
-    setInputError(null);
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleReset = () => {
+    setFormSubmitted(false);
+    setOpen(false);
   };
 
-  const handleAddFollowUp = () => {
-    setFormData((prevData) => ({
-      ...prevData,
-      scheduledEmails: [...prevData.scheduledEmails, { scheduledDate: "" }],
-    }));
-  };
+  const handleOpen = () => setOpen(true);
 
-  const handleFollowUpChange = (index, value) => {
-    const newScheduledEmails = formData.scheduledEmails.map((followUp, i) =>
-      i === index ? { scheduledDate: value } : followUp
-    );
-    setFormData((prevData) => ({
-      ...prevData,
-      scheduledEmails: newScheduledEmails,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleFormSubmit = async (data, setError, reset) => {
+    const filteredData = {
+      ...data,
+      scheduledEmails: data.scheduledEmails.filter(
+        (email) =>
+          email.scheduledDate && !isNaN(new Date(email.scheduledDate).getTime())
+      ),
+    };
     try {
-      //validateAddStudent(formData);
+      await submit("/students", "POST", filteredData);
+      setFormSubmitted(true);
+      triggerRefresh();
+      reset();
     } catch (error) {
-      setInputError(error.message);
+      setError("form", {
+        type: "manual",
+        message: error.message || "An error occurred during submission",
+      });
     }
-    submit(formData);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (submissionError) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (data) {
-    alert("Student added successfully");
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      eventDate: "",
-      scheduledEmails: [{ scheduledDate: "" }],
-    });
-  }
+  const handleClose = (event, reason) => {
+    if (formSubmitted) {
+      handleReset();
+    } else if (reason === "backdropClick") return;
+    handleReset();
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>First Name:</label>
-        <input
-          type="text"
-          name="firstName"
-          value={formData.firstName}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Last Name:</label>
-        <input
-          type="text"
-          name="lastName"
-          value={formData.lastName}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Email:</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Event Date:</label>
-        <input
-          type="date"
-          name="eventDate"
-          value={formData.eventDate}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Scheduled Emails:</label>
-        {formData.scheduledEmails.map((followUp, index) => (
-          <div key={index}>
-            <input
-              type="date"
-              value={followUp.scheduledDate}
-              onChange={(e) => handleFollowUpChange(index, e.target.value)}
-            />
-          </div>
-        ))}
-        <button type="button" onClick={handleAddFollowUp}>
-          Add Follow-Up Email
-        </button>
-      </div>
-      <button type="submit">Add Student</button>
-    </form>
+    <>
+      <Button onClick={() => setOpen(true)} variant="contained">
+        Add Student
+      </Button>
+      {formSubmitted ? (
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Success</DialogTitle>
+          <DialogContent>
+            <DialogContentText>Student added successfully.</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      ) : (
+        <Dialog open={open} onClose={handleClose}>
+          <FormContainer
+            defaultValues={{
+              firstName: "",
+              lastName: "",
+              email: "",
+              eventDate: "",
+              scheduledEmails: [],
+            }}
+            onSubmit={(data, methods) =>
+              handleFormSubmit(data, methods.setError, methods.reset)
+            }
+            validationSchema={schema}
+            resetOnClose={true}
+          >
+            <DialogTitle>Add Student</DialogTitle>
+            <DialogContent>
+              <TextField name="firstName" label="First Name" />
+              <TextField name="lastName" label="Last Name" />
+              <TextField name="email" label="Email" />
+              <DateField name="eventDate" label="Event Date" />
+              <Divider sx={{ my: 2 }} />
+              <ScheduledEmails />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={handleClose}
+                sx={{ width: "50%" }}
+                color="secondary"
+              >
+                Cancel
+              </Button>
+              <SubmitButton
+                label="Add Student"
+                sx={{ width: "50%" }}
+                disabled={loading}
+                watchFields={["firstName", "lastName", "email", "eventDate"]}
+              />
+            </DialogActions>
+          </FormContainer>
+        </Dialog>
+      )}
+    </>
   );
 };
 
-export default AddStudentForm;
+export default AddStudentModal;

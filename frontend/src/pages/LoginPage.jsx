@@ -1,57 +1,91 @@
-import React, { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import React from "react";
+import {
+  useSearchParams,
+  useNavigate,
+  Link as RouterLink,
+} from "react-router-dom";
+import * as yup from "yup";
+import FormContainer from "../components/Form/FormContainer";
+import TextField from "../components/Form/TextField";
+import CheckboxField from "../components/Form/CheckboxField";
+import SubmitButton from "../components/Form/SubmitButton";
+import { useAuth } from "../config/AuthContext";
+import { Link, Box, Typography } from "@mui/material";
+
+const schema = yup.object().shape({
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Invalid email")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@gmail.com$/,
+      "Only Gmail accounts are allowed"
+    ),
+  isAdmin: yup.boolean(),
+});
 
 const LoginPage = () => {
   const [searchParams] = useSearchParams();
   const redirectURL = searchParams.get("redirectTo");
-  const [gmail, setGmail] = useState("");
-  const [error, setError] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleFormSubmit = async (data, setError) => {
+    try {
+      await login(data.email, data.isAdmin, redirectURL);
+    } catch (error) {
+      setError("form", {
+        type: "manual",
+        message: error.message || "Login failed",
+      });
+    }
+  };
 
   const handleRegisterClick = () => {
     navigate("/register");
   };
 
-  const handleGmailChange = (e) => {
-    setError("");
-    setGmail(e.target.value);
-  };
-
-  const handleGoogleLogin = async () => {
-    if (!gmail.includes("gmail.com")) {
-      setError("Please enter a valid Gmail account");
-      return;
-    }
-    try {
-      login(gmail, isAdmin, redirectURL);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
   return (
-    <div>
-      <h1>Login</h1>
-      <input
-        type="email"
-        value={gmail}
-        autoComplete="email"
-        onChange={handleGmailChange}
-        placeholder="Enter your email"
-      />
-      <input
-        type="checkbox"
-        checked={isAdmin}
-        onChange={(e) => setIsAdmin(e.target.checked)}
-      />
-      <label>Admin</label>
-      <button onClick={handleGoogleLogin}>Login with Google</button>
-      <button onClick={handleRegisterClick}>Register</button>
-      {error && <div className="error">{error}</div>}
-    </div>
+    <Box
+      sx={{
+        minWidth: 550,
+        mx: "auto",
+        mt: 15,
+        p: 3,
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: 1,
+        backgroundColor: "background.paper",
+        boxShadow: 3,
+      }}
+    >
+      <Typography variant="h4" component="h1" align="center" sx={{ mb: 3 }}>
+        Login
+      </Typography>
+      <FormContainer
+        defaultValues={{ email: "", isAdmin: false }}
+        onSubmit={(data, methods) => handleFormSubmit(data, methods.setError)}
+        validationSchema={schema}
+      >
+        <TextField name="email" label="Email" />
+        <CheckboxField
+          name="isAdmin"
+          label="Admin"
+          sx={{ color: "primary.dark" }}
+        />
+        <SubmitButton
+          label="Login"
+          watchFields={["email", "isAdmin"]}
+          sx={{ mt: 2 }}
+        />
+      </FormContainer>
+      <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+        Don't have an account?{" "}
+        <Link component={RouterLink} to="/register" color="primary.light">
+          Sign up now!
+        </Link>
+      </Typography>
+    </Box>
   );
 };
 
