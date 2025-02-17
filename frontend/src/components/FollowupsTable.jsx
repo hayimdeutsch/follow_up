@@ -78,6 +78,7 @@
 // };
 
 // export default FollowupsTable;
+
 import React, { useState, useEffect } from "react";
 import {
   Typography,
@@ -95,9 +96,7 @@ import { Link } from "react-router-dom";
 import { Check as CheckIcon, Close as CloseIcon } from "@mui/icons-material";
 
 const FollowupsTable = ({ loading, student, triggerRefresh }) => {
-  const [followupsData, setFollowupsData] = useState(
-    (student && student.followUps) || []
-  );
+  const [followupsData, setFollowupsData] = useState([]);
   const [studentId, setStudentId] = useState("");
 
   useEffect(() => {
@@ -108,8 +107,7 @@ const FollowupsTable = ({ loading, student, triggerRefresh }) => {
   }, [loading, student, triggerRefresh]);
 
   return (
-    <Box sx={{ height: 500, overflow: "auto" }}>
-      <Typography variant="h6">Followups</Typography>
+    <Box sx={{ minHeight: 200, maxHeight: 500, overflow: "auto" }}>
       {loading ? (
         <Box
           display="flex"
@@ -179,6 +177,15 @@ const FollowupsTable = ({ loading, student, triggerRefresh }) => {
           </Table>
         </TableContainer>
       )}
+      <Button
+        variant="contained"
+        color="primary"
+        component={Link}
+        to={`/students/${studentId}/followup`}
+        sx={{ mt: 2 }}
+      >
+        Create New Followup
+      </Button>
     </Box>
   );
 };

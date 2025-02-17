@@ -15,7 +15,6 @@ import CustomThemeProvider from "./config/CustomThemeProvider";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { Box } from "@mui/material";
-import "./App.css";
 
 const App = () => {
   return (
@@ -23,30 +22,53 @@ const App = () => {
       <CustomThemeProvider>
         <Router>
           <AuthProvider>
-            <Header />
-            <Box className="main-content" component="main" sx={{ flexGrow: 1 }}>
-              <Routes>
-                <Route path="/" element={<TeacherDashboard />} />
-                <Route path="/students/:studentId" element={<StudentPage />} />
-                <Route
-                  path="/students/:studentId/followup"
-                  element={<FollowUpPage />}
-                />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegistrationPage />} />
-
-                <Route
-                  path="/followup/:token"
-                  element={<StudentFollowUpPage />}
-                />
-                <Route
-                  path="/teacher/followup/:id"
-                  element={<TeacherFollowUpView />}
-                />
-                <Route path="*" element={<PageNotFound />} />
-              </Routes>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100vh",
+              }}
+            >
+              <Header />
+              <Box
+                component="main"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexGrow: 1,
+                  padding: "15px 5%",
+                  width: "100%",
+                  overflowY: "auto",
+                }}
+              >
+                <Routes>
+                  <Route path="/" element={<TeacherDashboard />} />
+                  <Route path="/register" element={<RegistrationPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/student" element={<StudentPage />} />
+                  <Route
+                    path="/student/followup/create"
+                    element={<FollowUpPage mode={"create"} />}
+                  />
+                  <Route
+                    path="/student/followup/:id"
+                    element={<FollowUpPage mode={"edit"} />}
+                  />
+                  <Route
+                    path="/student/followup/:id/view"
+                    element={<FollowUpPage mode={"view"} />}
+                  />
+                  <Route
+                    path="/followup/:token"
+                    element={<FollowUpPage mode={"student"} />}
+                  />
+                  <Route path="*" element={<PageNotFound />} />
+                </Routes>
+              </Box>
+              <Footer />
             </Box>
-            <Footer />
           </AuthProvider>
         </Router>
       </CustomThemeProvider>

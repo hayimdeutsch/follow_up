@@ -102,7 +102,7 @@ const StudentTable = () => {
                   <TableCell>
                     <Button
                       component={Link}
-                      to={`/students/${student._id}`}
+                      to={`/student?id=${student._id}`}
                       variant="contained"
                       size="small"
                       sx={{

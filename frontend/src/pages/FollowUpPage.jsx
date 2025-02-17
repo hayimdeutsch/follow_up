@@ -5,8 +5,8 @@ import MeetingSelector from "../components/MeetingSelector";
 import EmailForm from "../components/EmailForm";
 import { backendUrl } from "../config/config.js";
 
-const FollowUpPage = () => {
-  const { studentId } = useParams();
+const FollowUpPage = ({ mode }) => {
+  const studentId = useSearchParams().get("student") || "";
   const location = useLocation();
   const [emailText, setEmailText] = useState("");
   const [questionnaire, setQuestionnaire] = useState({});

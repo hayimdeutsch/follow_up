@@ -48,43 +48,56 @@ const LoginPage = () => {
   return (
     <Box
       sx={{
-        minWidth: 550,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+        width: { xs: "70%", sm: "30%" },
         mx: "auto",
-        mt: 15,
-        p: 3,
-        border: "1px solid",
-        borderColor: "divider",
-        borderRadius: 1,
-        backgroundColor: "background.paper",
-        boxShadow: 3,
+        mt: 5,
+        p: { xs: 2, sm: 3 },
       }}
     >
-      <Typography variant="h4" component="h1" align="center" sx={{ mb: 3 }}>
-        Login
-      </Typography>
-      <FormContainer
-        defaultValues={{ email: "", isAdmin: false }}
-        onSubmit={(data, methods) => handleFormSubmit(data, methods.setError)}
-        validationSchema={schema}
+      <Box
+        sx={{
+          maxWidth: "100%",
+          width: "100%",
+          p: { xs: 2, sm: 3 },
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 1,
+          backgroundColor: "background.paper",
+          boxShadow: 3,
+        }}
       >
-        <TextField name="email" label="Email" />
-        <CheckboxField
-          name="isAdmin"
-          label="Admin"
-          sx={{ color: "primary.dark" }}
-        />
-        <SubmitButton
-          label="Login"
-          watchFields={["email", "isAdmin"]}
-          sx={{ mt: 2 }}
-        />
-      </FormContainer>
-      <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-        Don't have an account?{" "}
-        <Link component={RouterLink} to="/register" color="primary.light">
-          Sign up now!
-        </Link>
-      </Typography>
+        <Typography variant="h4" component="h1" align="center" sx={{ mb: 3 }}>
+          Login
+        </Typography>
+        <FormContainer
+          defaultValues={{ email: "", isAdmin: false }}
+          onSubmit={(data, methods) => handleFormSubmit(data, methods.setError)}
+          validationSchema={schema}
+        >
+          <TextField name="email" label="Email" fullWidth />
+          <CheckboxField
+            name="isAdmin"
+            label="Admin"
+            sx={{ color: "primary.dark" }}
+          />
+          <SubmitButton
+            label="Login"
+            watchFields={["email", "isAdmin"]}
+            sx={{ mt: 2 }}
+          />
+        </FormContainer>
+        <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+          Don't have an account?{" "}
+          <Link component={RouterLink} to="/register" color="primary.light">
+            Sign up now!
+          </Link>
+        </Typography>
+      </Box>
     </Box>
   );
 };

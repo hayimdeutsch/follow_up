@@ -62,6 +62,7 @@ const RegistrationPage = () => {
           mx: "auto",
           mt: 5,
           p: 3,
+          width: { xs: "70%", sm: "30%" },
           border: "1px solid",
           borderColor: "divider",
           borderRadius: 1,

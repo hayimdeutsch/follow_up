@@ -5,10 +5,21 @@ const Footer = () => {
   return (
     <Box
       component="footer"
-      sx={{ py: 1, mt: "auto", backgroundColor: "#8b2233", color: "#FFFFFF" }}
+      sx={{
+        py: { xs: 1, sm: 2 },
+        mt: "auto",
+        backgroundColor: "#8b2233",
+        color: "#FFFFFF",
+      }}
     >
-      <Container>
-        <Typography variant="body2" color="inherit" align="center">
+      <Container sx={{ textAlign: "center" }}>
+        <Typography
+          variant="body2"
+          color="inherit"
+          sx={{
+            fontSize: { xs: "0.875rem", sm: "1rem" },
+          }}
+        >
           © {new Date().getFullYear()} Connect. All rights reserved.
         </Typography>
       </Container>

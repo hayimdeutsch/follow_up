@@ -114,7 +114,7 @@ const AddStudentModal = ({ triggerRefresh }) => {
           </DialogActions>
         </Dialog>
       ) : (
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
           <FormContainer
             defaultValues={{
               firstName: "",
@@ -130,7 +130,13 @@ const AddStudentModal = ({ triggerRefresh }) => {
             resetOnClose={true}
           >
             <DialogTitle>Add Student</DialogTitle>
-            <DialogContent>
+            <DialogContent
+              sx={{
+                height: { xs: "auto", md: 500 }, // Dynamic height on mobile, fixed height on larger screens
+                overflowY: "auto", // Enable scrolling if content overflows
+              }}
+            >
+              {" "}
               <TextField name="firstName" label="First Name" />
               <TextField name="lastName" label="Last Name" />
               <TextField name="email" label="Email" />

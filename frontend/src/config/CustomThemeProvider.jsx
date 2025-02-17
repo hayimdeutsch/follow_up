@@ -4,12 +4,12 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { dark, light } from "@mui/material/styles/createPalette";
 
 const crimson = "#6d1c1e";
-const pinkRed = "#984a5e";
+const pinkRed = "#AE6577";
 const deepRed = "#8b2233";
 
 const lightBrown = "#cca586";
 const brown = "#8b5a2b";
-const paleBrown = "#f5f5f5";
+const paleBrown = "#bfaa8f";
 
 const blue = "#1b5885";
 const darkBlue = "#0f3057";
@@ -116,10 +116,35 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          backgroundColor: primaryColor.main,
+          backgroundColor: primaryColor.dark,
           color: white,
           "&:hover": {
-            backgroundColor: primaryColor.dark,
+            backgroundColor: primaryColor.main,
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          boxShadow: 3,
+          borderRadius: 1,
+          color: white,
+          "& *::-webkit-scrollbar": {
+            width: "8px",
+          },
+          "& *::-webkit-scrollbar-track": {
+            background: primaryColor.main,
+          },
+          "& *::-webkit-scrollbar-thumb": {
+            background: primaryColor.dark,
+            borderRadius: "4px",
+          },
+          "& *::-webkit-scrollbar-thumb:hover": {
+            background: "#555",
+          },
+          "& *": {
+            scrollbarColor: `${deepRed} ${lightGrey}`,
           },
         },
       },

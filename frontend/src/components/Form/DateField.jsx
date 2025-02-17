@@ -45,7 +45,13 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TextField as MuiTextField, Box, Typography } from "@mui/material";
 import dayjs from "dayjs";
 
-const DateField = ({ name, label, labelPosition = "in-field", ...props }) => {
+const DateField = ({
+  name,
+  label,
+  labelPosition = "in-field",
+  sx,
+  ...props
+}) => {
   const { control } = useFormContext();
 
   return (
@@ -61,7 +67,7 @@ const DateField = ({ name, label, labelPosition = "in-field", ...props }) => {
             {...field}
             {...props}
             label={labelPosition === "in-field" ? label : ""}
-            value={field.value ? dayjs(field.value) : null} // Ensure value is a dayjs object
+            value={field.value ? dayjs(field.value) : null}
             onChange={(newValue) => {
               field.onChange(newValue ? newValue.toISOString() : null);
             }}
@@ -72,6 +78,7 @@ const DateField = ({ name, label, labelPosition = "in-field", ...props }) => {
                 fullWidth: true,
                 variant: "outlined",
                 margin: "normal",
+                sx: sx,
               },
             }}
           />
