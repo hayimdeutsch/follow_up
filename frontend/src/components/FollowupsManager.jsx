@@ -82,7 +82,9 @@ const FollowupsManager = ({ loading, student }) => {
         variant="contained"
         color="primary"
         component={Link}
-        to={`/students/${studentId}/followup`}
+        to={{pathname: `/student/followups/create`,
+             state: { student }}
+      }
         sx={{ mt: 2 }}
       >
         Create New Followup

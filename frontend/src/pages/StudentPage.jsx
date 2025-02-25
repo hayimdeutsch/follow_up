@@ -15,14 +15,6 @@ const StudentPage = () => {
     error,
   } = useProtectedFetch(`/students/${studentId}`, refreshTrigger);
 
-  useEffect(() => {
-    console.log("StudentPage mounted");
-    console.log(studentId);
-    return () => {
-      console.log("StudentPage unmounted");
-    };
-  }, []);
-
   const refresh = () => {
     setRefreshTrigger((prev) => prev + 1);
   };

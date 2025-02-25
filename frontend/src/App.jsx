@@ -49,19 +49,19 @@ const App = () => {
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/student" element={<StudentPage />} />
                   <Route
-                    path="/student/followup/create"
+                    path="/student/followups/create"
                     element={<FollowUpPage mode={"create"} />}
                   />
                   <Route
-                    path="/student/followup/:id"
+                    path="/student/followups/:id"
                     element={<FollowUpPage mode={"edit"} />}
                   />
                   <Route
-                    path="/student/followup/:id/view"
+                    path="/student/followups/:id/view"
                     element={<FollowUpPage mode={"view"} />}
                   />
                   <Route
-                    path="/followup/:token"
+                    path="/followups/:token"
                     element={<FollowUpPage mode={"student"} />}
                   />
                   <Route path="*" element={<PageNotFound />} />
